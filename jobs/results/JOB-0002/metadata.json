@@ -1,0 +1,11 @@
+{
+  "job_id": "JOB-0002",
+  "thread_id": "01a0b4c3-e4a6-7730-94e8-2242e20b9af7",
+  "started_at": "2026-09-18T13:45:30.401907+00:00",
+  "reasoning_tier": "low",
+  "sandbox": "read-only",
+  "model": null,
+  "current_turn_tokens": null,
+  "cumulative_tokens": null,
+  "completed_at": "2026-09-18T13:48:35.076982+00:00"
+}

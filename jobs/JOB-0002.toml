@@ -1,0 +1,90 @@
+job_id = "JOB-0002"
+objective = "Inventory legacy stock-trading-system assets for the historical Top30 research project."
+reasoning_tier = "low"
+sandbox = "read-only"
+status = "pending"
+thread_id = ""
+prompt = """
+Read the canonical Stock Research Lab documents first.
+
+SOURCE REPOSITORY
+https://github.com/ansu-peter-lim/stock-trading-system
+
+TARGET REPOSITORY
+stock-research-lab
+
+OBJECTIVE
+Perform a research-oriented inventory of the legacy repository and determine
+which existing assets should support the three-year historical Top30 study.
+
+DO NOT migrate, modify, copy, commit, or push code in this job.
+
+Inspect at minimum:
+
+- src/telegram_top30_parser
+- telegram_collect_3years.py
+- src/research_universe
+- src/backtest_engine
+- src/kiwoom_daily
+- src/kiwoom_rest
+- src/krx_openapi
+- src/stock_mapping
+- relevant tests
+- docs/research
+- existing token-efficiency work
+
+For each meaningful component classify it as:
+
+REUSE
+  Suitable largely as-is.
+
+ADAPT
+  Valuable but requires modification for the new point-in-time Top30 research architecture.
+
+REFERENCE
+  Preserve its ideas/results but do not migrate the implementation initially.
+
+DEFER
+  Not required for the current historical Top30 research stage.
+
+For every REUSE or ADAPT candidate identify:
+- purpose
+- important files
+- dependencies
+- relevant tests
+- data/API assumptions
+- credentials/external-service assumptions
+- point-in-time / look-ahead risks
+- recommended migration order
+
+Pay special attention to:
+1. reconstructing approximately three years of historical Top30 records;
+2. stock-code/name mapping through historical corporate events;
+3. daily OHLCV/history acquisition;
+4. research-universe eligibility at historical cutoff dates;
+5. reusable technical indicators/backtest infrastructure;
+6. existing research knowledge worth preserving;
+7. code or architecture that would unnecessarily increase complexity/token usage.
+
+Produce a concise inventory report under:
+docs/migration/
+
+The report must include:
+- component classification matrix;
+- dependency map;
+- recommended minimal migration slice;
+- explicit deferred components;
+- known risks/unknowns;
+- proposed next migration job.
+
+Do not implement the migration.
+
+Run only inspection/read operations.
+Do not alter the legacy repository.
+
+Final response:
+summarize findings, report location, limitations, and recommended next job.
+"""
+created_at = ""
+completed_at = ""
+result_location = ""
