@@ -1,0 +1,353 @@
+job_id = "JOB-0011"
+objective = "Parse genuine Telegram message 15617 into a quarantined pre-assessment representation without weakening point-in-time guarantees."
+model_tier = "standard"
+reasoning_tier = "medium"
+sandbox = "workspace-write"
+status = "pending"
+thread_id = ""
+created_at = ""
+completed_at = ""
+result_location = ""
+
+prompt = """
+Read all canonical Stock Research Lab documents and prior audit/experiment
+results before working.
+
+Review especially:
+
+- docs/historical-research-protocol.md
+- docs/top30-observation-contract.md
+- docs/audits/JOB-0006-point-in-time-leakage-audit.md
+- docs/audits/JOB-0009-legacy-historical-artifact-audit.md
+- docs/experiments/JOB-0010-telegram-provenance-repair.md
+- src/research_contracts/top30.py
+- src/research_contracts/historical_fixture.py
+- existing Telegram parser-related legacy code
+
+TARGET REPOSITORY
+
+D:/Project/research
+
+LEGACY CODE REFERENCE
+
+D:/Project/stock-trading-system-reference
+
+Treat as strictly READ ONLY.
+
+LEGACY DATA REFERENCE
+
+D:/Project/stock
+
+Treat as strictly READ ONLY.
+
+TARGET REAL SOURCE
+
+Telegram message ID: 15617
+
+Legacy raw artifact:
+
+D:/Project/stock/data/telegram/daily/2023-09-01_07-36-30_15617.txt
+
+JOB-0010 provenance-repair evidence and restricted fixture manifest must be
+treated as the authoritative provenance inputs for this experiment.
+
+IMPORTANT EXISTING CLASSIFICATION
+
+JOB-0010 classified this artifact as:
+
+B_SOURCE_VERIFIED_CONTENT_STRONGLY_SUPPORTED
+
+The current Telegram content canonically matches the preserved legacy
+artifact, but exact historical cutoff-visible byte availability is NOT fully
+proven.
+
+Therefore availability remains insufficient for historical assessment.
+
+OBJECTIVE
+
+Build the minimum real-source parsing path:
+
+genuine restricted Telegram artifact
+    ->
+verified fixture/provenance
+    ->
+parser
+    ->
+PreAssessmentTop30 representation
+    ->
+QUARANTINE
+
+The output must preserve source-observed information while preventing it from
+becoming a historical Top30Observation, AssessmentPayload, or frozen
+assessment while availability remains insufficient.
+
+This job is NOT an outcome experiment.
+
+Do not access future price data.
+
+Do not broaden to other Telegram messages.
+
+Do not process the full three-year dataset.
+
+PART 1 — LEGACY PARSER REVIEW
+
+Inspect the minimum relevant legacy parser implementation.
+
+Determine:
+
+- how a Top30 Telegram report is recognized;
+- how report date/time is extracted;
+- how stock rows are extracted;
+- how rank/order is represented;
+- how stock names are preserved or normalized;
+- how returns/percent fields are parsed if present;
+- how malformed rows are handled;
+- where manual corrections historically entered the pipeline.
+
+Do not migrate the full parser architecture.
+
+Reuse or adapt only the minimum parsing logic needed for this real artifact.
+
+PART 2 — PRE-ASSESSMENT CONTRACT
+
+Introduce a small explicit pre-assessment representation if one does not
+already exist.
+
+It must represent parsed source observations that are genuine but not yet
+eligible for historical assessment.
+
+Preserve at minimum:
+
+- source artifact/provenance reference;
+- Telegram message ID;
+- source timestamp;
+- report/cutoff candidate;
+- exact source-observed stock name;
+- rank/order when available;
+- source-observed numeric fields when safely parseable;
+- parser version;
+- provenance/evidence classification;
+- availability state;
+- quarantine reason;
+- unresolved identity state where applicable.
+
+The representation must NOT imply historical assessment eligibility.
+
+PART 3 — EXACT SOURCE NAME PRESERVATION
+
+Preserve the exact stock name observed in the genuine Telegram source.
+
+If the legacy parser historically normalized names:
+
+- retain raw/source name separately;
+- normalization may be represented as parser output metadata;
+- never replace source-observed identity silently.
+
+Do not use current KRX/master mapping to fill codes.
+
+PART 4 — CORRECTION BOUNDARY
+
+Check message 15617 against the authoritative correction registry:
+
+D:/Project/stock/data/manual/telegram/top30_corrections.csv
+
+JOB-0010 found zero corrections for this message.
+
+Verify this remains true.
+
+Do not apply corrections from unrelated messages.
+
+The parser architecture must keep future correction/enrichment layers separate
+from immutable raw source observations.
+
+PART 5 — QUARANTINE GATE
+
+Implement an explicit gate between pre-assessment parsing and
+Top30Observation/AssessmentPayload.
+
+Because JOB-0010 availability is not cutoff-verified, message 15617 must NOT
+be promoted into assessment-time data.
+
+Attempts to promote it must fail explicitly.
+
+Do not rely on developer convention or documentation alone.
+
+Enforce this in code.
+
+A restricted real source may be parsed and inspected, but must remain
+quarantined until a later research-policy decision explicitly permits its
+evidence class.
+
+PART 6 — FORBIDDEN OUTPUTS
+
+For this message, while availability remains insufficient, the pipeline must
+not produce:
+
+- assessment-eligible Top30Observation;
+- AssessmentPayload;
+- frozen assessment;
+- historical resolved identity based on current master;
+- future/outcome labels.
+
+If existing APIs allow one of these paths, treat it as a leakage/integrity bug
+and fix it locally with regression tests.
+
+PART 7 — PARSING RESULT
+
+Parse exactly message 15617.
+
+Report:
+
+- whether it is recognized as a Top30 report;
+- parsed report timestamp/date;
+- row count;
+- rank/order coverage;
+- exact source names;
+- malformed/skipped row count;
+- duplicate row behavior;
+- source numeric fields parsed;
+- unresolved identity count;
+- quarantine reason.
+
+Do not manually alter the source to achieve 30 rows.
+
+If parser output differs from expected source content, investigate and report
+the reason.
+
+PART 8 — DETERMINISM
+
+Parsing the same immutable source artifact with the same parser version must
+produce deterministic pre-assessment output.
+
+Create a digest for the deterministic parsed representation.
+
+Bind it to:
+
+- source fixture digest;
+- provenance repair record;
+- parser version;
+- parsed representation digest.
+
+A source byte change or parser-version change must be detectable.
+
+PART 9 — MACHINE-READABLE ARTIFACT
+
+Create a small deterministic pre-assessment artifact under the target research
+data structure.
+
+It must clearly identify itself as:
+
+QUARANTINED / NOT ASSESSMENT ELIGIBLE
+
+Do not name or structure it in a way that could be confused with a frozen
+assessment.
+
+PART 10 — TESTS
+
+Add focused tests proving at minimum:
+
+1. genuine fixture digest is validated before parsing;
+2. source byte mismatch blocks parsing;
+3. parser recognizes the real message format;
+4. exact source stock names are preserved;
+5. row ordering/rank is deterministic;
+6. malformed rows cannot silently become valid observations;
+7. unrelated retrospective corrections are not applied;
+8. current KRX/master data cannot resolve identities during this stage;
+9. availability-restricted evidence cannot promote to Top30Observation;
+10. it cannot create AssessmentPayload;
+11. it cannot create a frozen assessment;
+12. unresolved identities remain explicit;
+13. deterministic parsed digest is stable;
+14. source digest changes invalidate the derived representation;
+15. parser version is bound to derived output;
+16. JOB-0006 adversarial leakage protections still pass;
+17. JOB-0007 write-once protections still pass;
+18. JOB-0009 provenance safeguards still pass;
+19. JOB-0010 provenance-repair tests still pass.
+
+NO NETWORK REQUIREMENT
+
+Do not require new Telegram network acquisition for this job.
+
+Use the already repaired JOB-0010 provenance evidence and existing local raw
+artifact.
+
+Do not access .env or session contents unless absolutely necessary.
+This job should normally require neither.
+
+NO OUTCOME DATA
+
+Do not access:
+
+- future OHLCV;
+- +5/+10/+20/+60 returns;
+- future KRX identity;
+- sector outcomes;
+- success/failure labels.
+
+DOCUMENTATION
+
+Create:
+
+docs/experiments/JOB-0011-real-pre-assessment-parsing.md
+
+Document:
+
+- real source used;
+- provenance classification inherited from JOB-0010;
+- parser adaptation;
+- exact parsing result;
+- source-name preservation;
+- correction result;
+- pre-assessment contract;
+- quarantine mechanism;
+- deterministic digest chain;
+- why assessment promotion is currently blocked;
+- limitations.
+
+READINESS VERDICT
+
+End with exactly one:
+
+PREASSESSMENT_PIPELINE_READY
+PREASSESSMENT_PIPELINE_READY_WITH_RESTRICTIONS
+PARSER_REPAIR_REQUIRED
+QUARANTINE_GATE_FAILED
+
+The verdict applies only to moving to a policy review of historical
+availability.
+
+It does NOT authorize assessment creation, outcome joining, bulk Telegram
+processing, or the full three-year study.
+
+QUALITY
+
+Run the complete pytest suite.
+Run git diff --check.
+
+Keep implementation minimal.
+
+Do not commit or push.
+
+FINAL RESPONSE
+
+Report:
+
+- requested model tier;
+- actual model if telemetry exposes it;
+- source message ID;
+- inherited provenance classification;
+- parsed row count;
+- malformed/skipped rows;
+- correction count;
+- unresolved identity count;
+- pre-assessment artifact path;
+- source digest;
+- parsed representation digest;
+- quarantine gate result;
+- tests;
+- readiness verdict;
+- residual risks;
+- recommended next job.
+"""
