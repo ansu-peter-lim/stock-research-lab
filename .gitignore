@@ -1,0 +1,42 @@
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+.venv.venv/
+venv/
+ENV/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+credentials/
+
+# Research data and generated outputs (keep schemas/README files tracked)
+data/raw/*
+data/processed/*
+data/derived/*
+data/market/*
+experiments/**/artifacts/
+experiments/**/outputs/
+*.parquet
+*.feather
+*.sqlite
+*.db
+
+# Logs, reports, and local tooling
+*.log
+.coverage
+htmlcov/
+.DS_Store
+Thumbs.db
+
+# Keep directory guidance files visible
+!data/**/README.md
+!experiments/**/README.md
