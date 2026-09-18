@@ -15,10 +15,14 @@ python -m orchestrator monitor
 ```
 
 `monitor` reads the file-backed `*.state.json` snapshots and works whether or
-not a job is active. Runners can report optional state with
+not a job is active. Jobs default to model tier `standard` and resolve to the
+verified `gpt-5.6-terra` model. The four tiers are `economy` →
+`gpt-5.6-luna`, `standard` → `gpt-5.6-terra`, `advanced` → `gpt-5.6-sol`, and
+`critical` → `gpt-6-astra`. Runners can report optional state with
 `JobStore.record_progress(...)` and `JobStore.record_activity(...)`; omitted
 progress remains omitted. Model and token fields are persisted only when the
-installed Codex SDK exposes them, otherwise the monitor displays `N/A`.
+installed Codex SDK exposes them, otherwise the monitor displays `N/A`. The
+monitor displays model tier, resolved model, and reasoning tier separately.
 
 Lifecycle commands always load the state snapshot first, so a pending status in
 the TOML does not prevent accepting or reworking a job whose runtime state has

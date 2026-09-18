@@ -1,0 +1,30 @@
+{
+  "job_id": "JOB-0004",
+  "objective": "Implement explicit four-tier Codex model policy.",
+  "reasoning_tier": "medium",
+  "prompt": "Read the canonical project documents and existing orchestrator implementation.\n\nOBJECTIVE:\nImplement an explicit four-tier model policy for Stock Research Lab.\n\nMODEL TIERS:\n\neconomy\n- Luna\n- deterministic inspection\n- extraction and formatting\n- repetitive operations\n- simple migrations\n- routine tests\n\nstandard\n- Terra\n- DEFAULT tier\n- normal implementation\n- data processing\n- debugging\n- parser work\n- ordinary quantitative analysis\n- normal research\n\nadvanced\n- Sol\n- important research design\n- complex debugging\n- multi-factor analysis\n- architecture decisions\n- consequential methodology work\n\ncritical\n- Astra\n- exceptional research gates only\n- major look-ahead or leakage audits\n- fundamental research-method changes\n- difficult cross-domain reasoning\n- major strategy architecture decisions\n- cases where lower tiers remain materially uncertain\n\nIMPLEMENTATION REQUIREMENTS:\n\n1. Support model_tier values:\n   economy, standard, advanced, critical.\n\n2. Default model_tier must be standard.\n\n3. Existing job files without model_tier must remain compatible\n   and resolve to standard.\n\n4. Reject unknown model tiers.\n\n5. Verify the actual Codex model identifiers available in the installed\n   environment. Do not guess model identifiers.\n\n6. Map the four project tiers to verified available models corresponding\n   to Luna, Terra, Sol, and Astra.\n\n7. reasoning_tier remains independently selectable:\n   low, medium, high.\n\n8. Never automatically select xhigh.\n\n9. Runtime state must persist:\n   requested model tier,\n   resolved actual model,\n   reasoning tier.\n\n10. Monitor must display:\n    Model Tier,\n    Model,\n    Reasoning.\n\n11. Do not estimate ChatGPT Pro weekly quota.\n\n12. Never fabricate model or token information.\n    Display N/A when actual information is unavailable.\n\n13. Update the canonical operating documentation.\n\n14. Add tests for:\n    all four model tiers,\n    standard default,\n    backward compatibility,\n    invalid model tier rejection,\n    model persistence,\n    monitor rendering.\n\n15. Preserve all existing tests.\n\n16. Keep implementation minimal.\n    No web UI.\n    No database.\n    No scheduler.\n    No automatic git commit or push.\n\n17. Run the complete pytest suite and git diff --check.\n\nFINAL RESPONSE:\nReport verified model identifiers, final mappings, files changed,\ntest results, limitations, and recommended next job.\n\nDo not commit or push.\n",
+  "sandbox": "workspace-write",
+  "model_tier": "standard",
+  "status": "accepted",
+  "thread_id": "01a0b4e6-142b-70b3-a091-95d9613e38d4",
+  "created_at": "2026-09-18T14:22:51.014402+00:00",
+  "started_at": "2026-09-18T14:22:51.014427+00:00",
+  "completed_at": "2026-09-18T14:30:05.140143+00:00",
+  "result_location": "jobs/results/JOB-0004/response.md",
+  "model": null,
+  "current_turn_tokens": null,
+  "cumulative_tokens": null,
+  "usage_recorded_at": null,
+  "usage_events": [],
+  "progress": null,
+  "activity": [
+    {
+      "timestamp": "2026-09-18T14:22:52.742081+00:00",
+      "message": "Codex thread started"
+    },
+    {
+      "timestamp": "2026-09-18T14:27:34.878453+00:00",
+      "message": "Codex run completed; awaiting review"
+    }
+  ]
+}

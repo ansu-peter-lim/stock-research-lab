@@ -12,6 +12,12 @@ from typing import Any
 
 
 REASONING_EFFORTS = {"low": "low", "medium": "medium", "high": "high"}
+MODEL_TIERS = {
+    "economy": "gpt-5.6-luna",
+    "standard": "gpt-5.6-terra",
+    "advanced": "gpt-5.6-sol",
+    "critical": "gpt-6-astra",
+}
 SANDBOXES = {"read-only": "read_only", "workspace-write": "workspace_write"}
 TRANSITIONS = {
     "pending": {"running", "failed"},
@@ -34,6 +40,7 @@ class Job:
     reasoning_tier: str
     prompt: str
     sandbox: str = "read-only"
+    model_tier: str = "standard"
     status: str = "pending"
     thread_id: str | None = None
     created_at: str | None = None
@@ -51,6 +58,8 @@ class Job:
     def __post_init__(self) -> None:
         if self.reasoning_tier not in REASONING_EFFORTS:
             raise ValueError("reasoning_tier must be low, medium, or high; xhigh is not supported")
+        if self.model_tier not in MODEL_TIERS:
+            raise ValueError("model_tier must be economy, standard, advanced, or critical")
         if self.sandbox not in SANDBOXES:
             raise ValueError("sandbox must be read-only or workspace-write")
         if self.status not in TRANSITIONS:
@@ -90,7 +99,7 @@ class JobStore:
             data.update(json.loads(state_path.read_text(encoding="utf-8")))
         return Job(**{key: data[key] for key in (
             "job_id", "objective", "reasoning_tier", "prompt", "sandbox",
-            "status", "thread_id", "created_at", "started_at", "completed_at",
+            "model_tier", "status", "thread_id", "created_at", "started_at", "completed_at",
             "result_location", "model", "current_turn_tokens",
             "cumulative_tokens", "usage_recorded_at", "progress", "activity",
             "usage_events",
@@ -140,6 +149,7 @@ def create_job_file(job_id: str, jobs_dir: str | Path = "jobs") -> Path:
     target.write_text(
         f'job_id = "{job_id}"\n'
         'objective = "Describe the bounded objective before implementation."\n'
+        'model_tier = "standard"\n'
         'reasoning_tier = "medium"\n'
         'sandbox = "read-only"\n'
         'status = "pending"\n'
@@ -208,8 +218,13 @@ def run_job(path: str | Path, *, codex_factory: Any | None = None) -> Job:
             job.thread_id = str(thread.id)
             job.activity.append({"timestamp": _now(), "message": "Codex thread started"})
             store.save(job, job_path)
-            result = thread.run(job.prompt, effort=REASONING_EFFORTS[job.reasoning_tier], sandbox=sandbox)
-            job.model = _model_name(result, thread) or job.model
+            result = thread.run(
+                job.prompt,
+                effort=REASONING_EFFORTS[job.reasoning_tier],
+                model=MODEL_TIERS[job.model_tier],
+                sandbox=sandbox,
+            )
+            job.model = _model_name(result, thread) or MODEL_TIERS[job.model_tier]
             turn_tokens = _usage_total(result)
             job.current_turn_tokens = turn_tokens
             if turn_tokens is not None:
@@ -223,6 +238,7 @@ def run_job(path: str | Path, *, codex_factory: Any | None = None) -> Job:
             "job_id": job.job_id,
             "thread_id": job.thread_id,
             "started_at": job.started_at,
+            "model_tier": job.model_tier,
             "reasoning_tier": job.reasoning_tier,
             "sandbox": job.sandbox,
             "model": job.model,
@@ -292,8 +308,9 @@ def render_monitor(jobs_dir: str | Path = "jobs", *, now: datetime | None = None
             f"  objective/title: {_display(job.get('objective'))}",
             f"  status: {_display(job.get('status'))}",
             f"  started_at: {_display(job.get('started_at'))}",
-            f"  model: {_display(job.get('model'))}",
-            f"  reasoning tier: {_display(job.get('reasoning_tier'))}",
+            f"  Model Tier: {_display(job.get('model_tier') or 'standard')}",
+            f"  Model: {_display(job.get('model'))}",
+            f"  Reasoning: {_display(job.get('reasoning_tier'))}",
             f"  sandbox: {_display(job.get('sandbox'))}",
             f"  thread ID: {_short_thread_id(job.get('thread_id'))}",
         ])

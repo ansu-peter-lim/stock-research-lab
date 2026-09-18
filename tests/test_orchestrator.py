@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from orchestrator.core import Job, JobStore, create_job_file, render_monitor, run_job
+from orchestrator.core import MODEL_TIERS, Job, JobStore, create_job_file, render_monitor, run_job
 from orchestrator.__main__ import main
 
 
@@ -25,14 +25,14 @@ class FakeThread:
     def __init__(self, calls):
         self.calls = calls
 
-    def run(self, prompt, effort, sandbox):
-        self.calls.append((prompt, effort, sandbox))
+    def run(self, prompt, effort, sandbox, model=None):
+        self.calls.append((prompt, effort, sandbox, model))
         return FakeResult()
 
 
 class UsageThread(FakeThread):
-    def run(self, prompt, effort, sandbox):
-        self.calls.append((prompt, effort, sandbox))
+    def run(self, prompt, effort, sandbox, model=None):
+        self.calls.append((prompt, effort, sandbox, model))
         return UsageResult()
 
 
@@ -90,6 +90,17 @@ class OrchestratorTests(unittest.TestCase):
         self.assertEqual(Job("a", "b", "medium", "p").reasoning_tier, "medium")
         self.assertEqual(Job("a", "b", "high", "p").reasoning_tier, "high")
 
+    def test_model_tier_mapping_and_standard_default(self):
+        self.assertEqual(Job("a", "b", "medium", "p").model_tier, "standard")
+        self.assertEqual(set(MODEL_TIERS), {"economy", "standard", "advanced", "critical"})
+        for tier, model in MODEL_TIERS.items():
+            self.assertEqual(Job("a", "b", "medium", "p", model_tier=tier).model_tier, tier)
+            self.assertTrue(model.startswith("gpt-"))
+
+    def test_unknown_model_tier_rejected(self):
+        with self.assertRaises(ValueError):
+            Job("a", "b", "medium", "p", model_tier="unknown")
+
     def test_xhigh_rejected(self):
         with self.assertRaises(ValueError):
             Job("a", "b", "xhigh", "p")
@@ -118,6 +129,24 @@ class OrchestratorTests(unittest.TestCase):
             self.assertEqual(json.loads(state.read_text())["thread_id"], "thread-test-123")
             self.assertEqual(calls[1][1], "medium")
             self.assertEqual(calls[0][2].value, "read-only")
+            self.assertEqual(calls[1][3], MODEL_TIERS["standard"])
+            self.assertEqual(job.model, MODEL_TIERS["standard"])
+
+    def test_legacy_job_without_model_tier_resolves_to_standard(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = write_job(tmp)
+            self.assertEqual(JobStore(tmp).load(path).model_tier, "standard")
+
+    def test_requested_and_resolved_model_persist(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            calls = []
+            path = write_job(tmp, model_tier="advanced")
+            job = run_job(path, codex_factory=lambda: FakeCodex(calls))
+            state = json.loads(Path(tmp, "test.state.json").read_text())
+            self.assertEqual(state["model_tier"], "advanced")
+            self.assertEqual(state["model"], MODEL_TIERS["advanced"])
+            self.assertEqual(state["reasoning_tier"], "medium")
+            self.assertEqual(calls[1][3], MODEL_TIERS["advanced"])
 
     def test_existing_thread_id_is_resumed(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -169,7 +198,9 @@ class OrchestratorTests(unittest.TestCase):
             rendered = render_monitor(tmp)
             self.assertIn("Stock Research Lab Monitor", rendered)
             self.assertIn("ID: TEST-001", rendered)
-            self.assertIn("model: codex-test", rendered)
+            self.assertIn("Model Tier: standard", rendered)
+            self.assertIn("Model: codex-test", rendered)
+            self.assertIn("Reasoning: medium", rendered)
             self.assertIn("completed: 2", rendered)
             self.assertIn("current turn tokens: 17", rendered)
             self.assertIn("current job cumulative tokens: 17", rendered)

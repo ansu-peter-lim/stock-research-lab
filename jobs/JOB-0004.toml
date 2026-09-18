@@ -1,0 +1,118 @@
+job_id = "JOB-0004"
+objective = "Implement explicit four-tier Codex model policy."
+model_tier = "standard"
+reasoning_tier = "medium"
+sandbox = "workspace-write"
+status = "pending"
+thread_id = ""
+created_at = ""
+completed_at = ""
+result_location = ""
+
+prompt = """
+Read the canonical project documents and existing orchestrator implementation.
+
+OBJECTIVE:
+Implement an explicit four-tier model policy for Stock Research Lab.
+
+MODEL TIERS:
+
+economy
+- Luna
+- deterministic inspection
+- extraction and formatting
+- repetitive operations
+- simple migrations
+- routine tests
+
+standard
+- Terra
+- DEFAULT tier
+- normal implementation
+- data processing
+- debugging
+- parser work
+- ordinary quantitative analysis
+- normal research
+
+advanced
+- Sol
+- important research design
+- complex debugging
+- multi-factor analysis
+- architecture decisions
+- consequential methodology work
+
+critical
+- Astra
+- exceptional research gates only
+- major look-ahead or leakage audits
+- fundamental research-method changes
+- difficult cross-domain reasoning
+- major strategy architecture decisions
+- cases where lower tiers remain materially uncertain
+
+IMPLEMENTATION REQUIREMENTS:
+
+1. Support model_tier values:
+   economy, standard, advanced, critical.
+
+2. Default model_tier must be standard.
+
+3. Existing job files without model_tier must remain compatible
+   and resolve to standard.
+
+4. Reject unknown model tiers.
+
+5. Verify the actual Codex model identifiers available in the installed
+   environment. Do not guess model identifiers.
+
+6. Map the four project tiers to verified available models corresponding
+   to Luna, Terra, Sol, and Astra.
+
+7. reasoning_tier remains independently selectable:
+   low, medium, high.
+
+8. Never automatically select xhigh.
+
+9. Runtime state must persist:
+   requested model tier,
+   resolved actual model,
+   reasoning tier.
+
+10. Monitor must display:
+    Model Tier,
+    Model,
+    Reasoning.
+
+11. Do not estimate ChatGPT Pro weekly quota.
+
+12. Never fabricate model or token information.
+    Display N/A when actual information is unavailable.
+
+13. Update the canonical operating documentation.
+
+14. Add tests for:
+    all four model tiers,
+    standard default,
+    backward compatibility,
+    invalid model tier rejection,
+    model persistence,
+    monitor rendering.
+
+15. Preserve all existing tests.
+
+16. Keep implementation minimal.
+    No web UI.
+    No database.
+    No scheduler.
+    No automatic git commit or push.
+
+17. Run the complete pytest suite and git diff --check.
+
+FINAL RESPONSE:
+Report verified model identifiers, final mappings, files changed,
+test results, limitations, and recommended next job.
+
+Do not commit or push.
+"""
