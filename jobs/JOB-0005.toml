@@ -1,0 +1,110 @@
+job_id = "JOB-0005"
+objective = "Build the minimal cutoff-aware historical stock identity contract."
+model_tier = "standard"
+reasoning_tier = "medium"
+sandbox = "workspace-write"
+status = "pending"
+thread_id = ""
+created_at = ""
+completed_at = ""
+result_location = ""
+
+prompt = """
+Read all canonical project documents, the Top30 observation contract,
+and docs/migration/legacy-inventory.md first.
+
+Legacy reference:
+D:/Project/stock-trading-system-reference
+
+Treat the legacy repository as strictly READ ONLY.
+Use local files only. Do not use GitHub web requests.
+
+OBJECTIVE
+
+Design and implement the minimum historical stock-identity layer needed
+to resolve a Top30 observation such as a historical stock name to a stock
+code without introducing future information.
+
+This job is about identity/provenance only.
+Do not migrate the full KRX, Kiwoom, eligibility, or backtest systems.
+Do not process the full three-year dataset.
+
+RESEARCH PRINCIPLE
+
+For cutoff D, identity evidence is usable in assessment only when that
+evidence was available by D.
+
+Clearly distinguish:
+- source-observed identity
+- point-in-time verified identity
+- unresolved identity
+- retrospective enrichment
+
+Do not silently apply a current KRX master to historical observations.
+
+INSPECT LEGACY COMPONENTS
+
+At minimum inspect:
+- src/stock_mapping
+- src/krx_openapi
+- relevant mapping/KRX tests
+- relevant research documentation
+
+Reuse concepts or minimal code only when justified.
+
+IMPLEMENTATION
+
+Create a minimal historical identity contract/bundle that can represent:
+
+- observed stock name
+- resolved stock code when justified
+- unresolved state
+- evidence source
+- evidence publication/availability timestamp
+- effective date when relevant
+- provenance/reference
+- resolution method
+- retrospective flag/boundary
+
+Integrate only the minimum required boundary with the existing
+Top30Observation / AssessmentPayload contract.
+
+LEAKAGE PROTECTION
+
+Assessment-time identity resolution must not use evidence whose availability
+timestamp is after the historical cutoff.
+
+Where publication date and effective date differ, preserve both rather than
+collapsing them.
+
+Do not guess a stock code when evidence is insufficient.
+
+TESTS
+
+Add representative fixtures and tests proving at minimum:
+
+1. identity known by cutoff can be used;
+2. evidence published after cutoff cannot enter assessment identity;
+3. unresolved historical identity remains unresolved;
+4. retrospective mapping remains auditable but excluded from assessment;
+5. publication date and effective date remain distinct;
+6. provenance survives serialization round-trip;
+7. integration with Top30Observation preserves its point-in-time guarantees.
+
+Also document known limitations where historical evidence is unavailable.
+
+Keep implementation small and explicit.
+
+Run complete pytest and git diff --check.
+Do not commit or push.
+
+FINAL RESPONSE
+
+Report:
+- contract design
+- legacy concepts reused/adapted
+- leakage protections
+- tests
+- unresolved historical-data questions
+- recommended next job
+"""

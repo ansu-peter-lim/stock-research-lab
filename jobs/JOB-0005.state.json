@@ -1,0 +1,30 @@
+{
+  "job_id": "JOB-0005",
+  "objective": "Build the minimal cutoff-aware historical stock identity contract.",
+  "reasoning_tier": "medium",
+  "prompt": "Read all canonical project documents, the Top30 observation contract,\nand docs/migration/legacy-inventory.md first.\n\nLegacy reference:\nD:/Project/stock-trading-system-reference\n\nTreat the legacy repository as strictly READ ONLY.\nUse local files only. Do not use GitHub web requests.\n\nOBJECTIVE\n\nDesign and implement the minimum historical stock-identity layer needed\nto resolve a Top30 observation such as a historical stock name to a stock\ncode without introducing future information.\n\nThis job is about identity/provenance only.\nDo not migrate the full KRX, Kiwoom, eligibility, or backtest systems.\nDo not process the full three-year dataset.\n\nRESEARCH PRINCIPLE\n\nFor cutoff D, identity evidence is usable in assessment only when that\nevidence was available by D.\n\nClearly distinguish:\n- source-observed identity\n- point-in-time verified identity\n- unresolved identity\n- retrospective enrichment\n\nDo not silently apply a current KRX master to historical observations.\n\nINSPECT LEGACY COMPONENTS\n\nAt minimum inspect:\n- src/stock_mapping\n- src/krx_openapi\n- relevant mapping/KRX tests\n- relevant research documentation\n\nReuse concepts or minimal code only when justified.\n\nIMPLEMENTATION\n\nCreate a minimal historical identity contract/bundle that can represent:\n\n- observed stock name\n- resolved stock code when justified\n- unresolved state\n- evidence source\n- evidence publication/availability timestamp\n- effective date when relevant\n- provenance/reference\n- resolution method\n- retrospective flag/boundary\n\nIntegrate only the minimum required boundary with the existing\nTop30Observation / AssessmentPayload contract.\n\nLEAKAGE PROTECTION\n\nAssessment-time identity resolution must not use evidence whose availability\ntimestamp is after the historical cutoff.\n\nWhere publication date and effective date differ, preserve both rather than\ncollapsing them.\n\nDo not guess a stock code when evidence is insufficient.\n\nTESTS\n\nAdd representative fixtures and tests proving at minimum:\n\n1. identity known by cutoff can be used;\n2. evidence published after cutoff cannot enter assessment identity;\n3. unresolved historical identity remains unresolved;\n4. retrospective mapping remains auditable but excluded from assessment;\n5. publication date and effective date remain distinct;\n6. provenance survives serialization round-trip;\n7. integration with Top30Observation preserves its point-in-time guarantees.\n\nAlso document known limitations where historical evidence is unavailable.\n\nKeep implementation small and explicit.\n\nRun complete pytest and git diff --check.\nDo not commit or push.\n\nFINAL RESPONSE\n\nReport:\n- contract design\n- legacy concepts reused/adapted\n- leakage protections\n- tests\n- unresolved historical-data questions\n- recommended next job\n",
+  "sandbox": "workspace-write",
+  "model_tier": "standard",
+  "status": "accepted",
+  "thread_id": "01a0b4ef-bcc9-7c31-b131-1e464fece069",
+  "created_at": "2026-09-18T14:33:24.042159+00:00",
+  "started_at": "2026-09-18T14:33:24.042184+00:00",
+  "completed_at": "2026-09-18T15:08:23.857053+00:00",
+  "result_location": "jobs/results/JOB-0005/response.md",
+  "model": "gpt-5.6-terra",
+  "current_turn_tokens": null,
+  "cumulative_tokens": null,
+  "usage_recorded_at": null,
+  "usage_events": [],
+  "progress": null,
+  "activity": [
+    {
+      "timestamp": "2026-09-18T14:33:25.754987+00:00",
+      "message": "Codex thread started"
+    },
+    {
+      "timestamp": "2026-09-18T14:37:58.533476+00:00",
+      "message": "Codex run completed; awaiting review"
+    }
+  ]
+}

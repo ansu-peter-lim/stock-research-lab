@@ -1,0 +1,12 @@
+{
+  "job_id": "JOB-0006",
+  "thread_id": "01a0b4f6-8b76-7fe2-a1ca-1e7b0daa8adb",
+  "started_at": "2026-09-18T14:40:50.270341+00:00",
+  "model_tier": "advanced",
+  "reasoning_tier": "high",
+  "sandbox": "workspace-write",
+  "model": "gpt-5.6-sol",
+  "current_turn_tokens": null,
+  "cumulative_tokens": null,
+  "completed_at": "2026-09-18T14:51:34.351725+00:00"
+}

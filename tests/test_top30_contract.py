@@ -64,14 +64,16 @@ class Top30ContractTests(unittest.TestCase):
 
     def test_confirmed_mapping_requires_cutoff_visible_evidence(self):
         source = self.observation().source
-        confirmed = MappingState("point_in_time_confirmed", "005930", source)
+        confirmed = MappingState("point_in_time_confirmed", "005930", source,
+                                 "source_embedded_code")
         self.assertEqual(confirmed.stock_code, "005930")
         with self.assertRaises(ValueError):
             Top30Observation(self.observation().observation_date, self.observation().cutoff_at, 1,
                              "삼성전자", source, "v", self.observation().ingested_at,
                              MappingState("point_in_time_confirmed", "005930", Provenance(
                                  "krx", "future", "x", "d" * 64,
-                                 datetime(2026, 9, 19, tzinfo=timezone.utc))))
+                                 datetime(2026, 9, 19, tzinfo=timezone.utc),
+                                 InformationBoundary.POINT_IN_TIME), "official_notice"))
 
 
 if __name__ == "__main__":

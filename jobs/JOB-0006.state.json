@@ -1,0 +1,30 @@
+{
+  "job_id": "JOB-0006",
+  "objective": "Perform an independent point-in-time and look-ahead leakage audit of the historical Top30 identity architecture.",
+  "reasoning_tier": "high",
+  "prompt": "Read all canonical Stock Research Lab documents first.\n\nReview especially:\n\n- docs/top30-observation-contract.md\n- docs/historical-research-protocol.md\n- docs/migration/legacy-inventory.md\n- src/research_contracts/top30.py\n- tests/test_top30_contract.py\n- tests/test_historical_identity.py\n\nLegacy reference repository:\nD:/Project/stock-trading-system-reference\n\nTreat the legacy repository as strictly READ ONLY.\nUse local files only.\n\nROLE\n\nAct as an independent research-integrity auditor.\n\nDo not assume JOB-0003 or JOB-0005 designs are correct merely because\ntheir tests pass.\n\nOBJECTIVE\n\nAudit the complete point-in-time boundary:\n\nTop30 source observation\n    ->\nTop30Observation\n    ->\nHistoricalIdentityBundle\n    ->\nIdentityResolution\n    ->\nAssessmentPayload\n\nDetermine whether future or retrospectively-known information can enter\na historical assessment, directly or indirectly.\n\nAUDIT AREAS\n\nInvestigate at minimum:\n\n1. Availability vs effective date\n   - Verify effective dates cannot substitute for evidence availability.\n   - Look for boundary/equality/timezone edge cases.\n\n2. Current-master leakage\n   - Determine whether current KRX/master/mapping information could\n     silently resolve a historical observation.\n\n3. Retrospective enrichment leakage\n   - Attempt to move retrospective identity evidence into AssessmentPayload.\n   - Look for alternate construction/serialization paths.\n\n4. Serialization boundary\n   - Test whether serialize/deserialize/round-trip operations can weaken\n     point-in-time restrictions or alter provenance.\n\n5. Mutation / historical rewrite\n   - Determine whether a previously frozen unresolved observation can later\n     become resolved in a way that silently changes historical assessment.\n\n6. Identity ambiguity\n   - Same/similar historical names.\n   - Name changes.\n   - Reused names.\n   - ticker/code changes.\n   - mergers.\n   - splits.\n   - relisting/delisting.\n   - corporate-event timing.\n\n7. Telegram source semantics\n   - edited messages\n   - deleted messages\n   - duplicate reports\n   - delayed ingestion\n   - source timestamp versus ingestion timestamp\n\n8. Timestamp semantics\n   - timezone handling\n   - date-only evidence\n   - intraday cutoff\n   - publication time uncertainty\n   - equality at cutoff\n\n9. Provenance integrity\n   - missing/weak provenance\n   - digest/reference mismatch\n   - evidence replacement\n   - retrospective artifacts masquerading as historical artifacts\n\n10. Unresolved identity behavior\n    - Ensure downstream analysis cannot silently drop, guess, or\n      current-map unresolved historical observations.\n\nADVERSARIAL TESTING\n\nAdd tests that intentionally attempt to violate the point-in-time boundary.\n\nPrefer tests demonstrating actual exploit paths over theoretical discussion.\n\nClassify findings:\n\nCRITICAL\nFuture information can enter a historical assessment.\n\nHIGH\nA realistic path could corrupt point-in-time research integrity.\n\nMEDIUM\nAmbiguity or weak invariant could cause future research errors.\n\nLOW\nDocumentation, ergonomics, or defensive-hardening issue.\n\nFIX POLICY\n\n- Fix confirmed CRITICAL or HIGH issues when the correction is small,\n  local, and clearly justified.\n- Add regression tests for every fixed issue.\n- Do not redesign the architecture merely for elegance.\n- For MEDIUM/LOW findings, document them unless a trivial safe fix exists.\n- Do not introduce KRX network acquisition or full legacy migration.\n\nIMPORTANT\n\nThe current lack of immutable historical KRX artifacts with reliable\navailability timestamps is a known data limitation.\n\nDo not solve that limitation by using current master data as historical truth.\n\nOUTPUT\n\nCreate:\n\ndocs/audits/JOB-0006-point-in-time-leakage-audit.md\n\nThe audit must contain:\n\n- audit scope\n- threat model\n- findings by severity\n- attempted exploit paths\n- tests added\n- fixes made\n- residual risks\n- unresolved data limitations\n- explicit verdict on whether the architecture is ready for a small\n  historical fixture experiment\n\nThe verdict must be one of:\n\nREADY_FOR_FIXTURE\nREADY_WITH_RESTRICTIONS\nNOT_READY\n\nDo not claim readiness for the full three-year study.\nThis audit only decides readiness for the next small historical fixture.\n\nQUALITY\n\nRun the complete pytest suite.\nRun git diff --check.\n\nDo not commit or push.\n\nFINAL RESPONSE\n\nReport:\n\n- actual model used\n- finding counts by severity\n- confirmed leakage paths\n- fixes made\n- total test result\n- audit verdict\n- residual risks\n- recommended next job\n",
+  "sandbox": "workspace-write",
+  "model_tier": "advanced",
+  "status": "accepted",
+  "thread_id": "01a0b4f6-8b76-7fe2-a1ca-1e7b0daa8adb",
+  "created_at": "2026-09-18T14:40:50.270315+00:00",
+  "started_at": "2026-09-18T14:40:50.270341+00:00",
+  "completed_at": "2026-09-18T15:08:24.859975+00:00",
+  "result_location": "jobs/results/JOB-0006/response.md",
+  "model": "gpt-5.6-sol",
+  "current_turn_tokens": null,
+  "cumulative_tokens": null,
+  "usage_recorded_at": null,
+  "usage_events": [],
+  "progress": null,
+  "activity": [
+    {
+      "timestamp": "2026-09-18T14:40:51.873298+00:00",
+      "message": "Codex thread started"
+    },
+    {
+      "timestamp": "2026-09-18T14:51:34.352606+00:00",
+      "message": "Codex run completed; awaiting review"
+    }
+  ]
+}

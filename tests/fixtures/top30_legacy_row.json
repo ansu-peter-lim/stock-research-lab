@@ -11,7 +11,8 @@
     "source_id": "telegram:balanceasset:123",
     "raw_reference": "2026-08-29_01-02-03_123.txt#rank=1",
     "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "available_at": "2026-08-29T01:02:03Z"
+    "available_at": "2026-08-29T01:02:03Z",
+    "boundary": "point_in_time"
   },
   "mapping": {
     "status": "unresolved",

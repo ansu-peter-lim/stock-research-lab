@@ -1,0 +1,41 @@
+{
+  "observed_stock_name": "Example Historical Name",
+  "resolution": {
+    "status": "point_in_time_verified",
+    "stock_code": "005930",
+    "resolution_method": "official_notice_exact_name",
+    "evidence": {
+      "source": {
+        "source_kind": "official_notice",
+        "source_id": "notice:example-1",
+        "raw_reference": "notices/example-1.html",
+        "content_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "available_at": "2024-04-18T09:05:00Z",
+        "boundary": "point_in_time"
+      },
+      "published_at": "2024-04-18T09:00:00Z",
+      "effective_date": "2024-04-19",
+      "reference": "official notice example-1"
+    }
+  },
+  "retrospective": [
+    {
+      "status": "retrospective_enrichment",
+      "stock_code": "005930",
+      "resolution_method": "current_master_cross_check",
+      "evidence": {
+        "source": {
+          "source_kind": "krx_master",
+          "source_id": "krx:2026-08-30",
+          "raw_reference": "master/2026-08-30.csv#005930",
+          "content_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "available_at": "2026-08-30T00:00:00Z",
+          "boundary": "retrospective"
+        },
+        "published_at": "2026-08-30T00:00:00Z",
+        "effective_date": null,
+        "reference": "later KRX master snapshot"
+      }
+    }
+  ]
+}

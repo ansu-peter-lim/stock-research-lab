@@ -2,6 +2,10 @@
 
 from .top30 import (
     AssessmentPayload,
+    HistoricalIdentityBundle,
+    IdentityEvidence,
+    IdentityResolution,
+    IdentityStatus,
     InformationBoundary,
     MappingState,
     Provenance,
@@ -11,6 +15,10 @@ from .top30 import (
 
 __all__ = [
     "AssessmentPayload",
+    "HistoricalIdentityBundle",
+    "IdentityEvidence",
+    "IdentityResolution",
+    "IdentityStatus",
     "InformationBoundary",
     "MappingState",
     "Provenance",

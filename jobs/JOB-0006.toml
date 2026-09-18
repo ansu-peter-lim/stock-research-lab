@@ -1,0 +1,195 @@
+job_id = "JOB-0006"
+objective = "Perform an independent point-in-time and look-ahead leakage audit of the historical Top30 identity architecture."
+model_tier = "advanced"
+reasoning_tier = "high"
+sandbox = "workspace-write"
+status = "pending"
+thread_id = ""
+created_at = ""
+completed_at = ""
+result_location = ""
+
+prompt = """
+Read all canonical Stock Research Lab documents first.
+
+Review especially:
+
+- docs/top30-observation-contract.md
+- docs/historical-research-protocol.md
+- docs/migration/legacy-inventory.md
+- src/research_contracts/top30.py
+- tests/test_top30_contract.py
+- tests/test_historical_identity.py
+
+Legacy reference repository:
+D:/Project/stock-trading-system-reference
+
+Treat the legacy repository as strictly READ ONLY.
+Use local files only.
+
+ROLE
+
+Act as an independent research-integrity auditor.
+
+Do not assume JOB-0003 or JOB-0005 designs are correct merely because
+their tests pass.
+
+OBJECTIVE
+
+Audit the complete point-in-time boundary:
+
+Top30 source observation
+    ->
+Top30Observation
+    ->
+HistoricalIdentityBundle
+    ->
+IdentityResolution
+    ->
+AssessmentPayload
+
+Determine whether future or retrospectively-known information can enter
+a historical assessment, directly or indirectly.
+
+AUDIT AREAS
+
+Investigate at minimum:
+
+1. Availability vs effective date
+   - Verify effective dates cannot substitute for evidence availability.
+   - Look for boundary/equality/timezone edge cases.
+
+2. Current-master leakage
+   - Determine whether current KRX/master/mapping information could
+     silently resolve a historical observation.
+
+3. Retrospective enrichment leakage
+   - Attempt to move retrospective identity evidence into AssessmentPayload.
+   - Look for alternate construction/serialization paths.
+
+4. Serialization boundary
+   - Test whether serialize/deserialize/round-trip operations can weaken
+     point-in-time restrictions or alter provenance.
+
+5. Mutation / historical rewrite
+   - Determine whether a previously frozen unresolved observation can later
+     become resolved in a way that silently changes historical assessment.
+
+6. Identity ambiguity
+   - Same/similar historical names.
+   - Name changes.
+   - Reused names.
+   - ticker/code changes.
+   - mergers.
+   - splits.
+   - relisting/delisting.
+   - corporate-event timing.
+
+7. Telegram source semantics
+   - edited messages
+   - deleted messages
+   - duplicate reports
+   - delayed ingestion
+   - source timestamp versus ingestion timestamp
+
+8. Timestamp semantics
+   - timezone handling
+   - date-only evidence
+   - intraday cutoff
+   - publication time uncertainty
+   - equality at cutoff
+
+9. Provenance integrity
+   - missing/weak provenance
+   - digest/reference mismatch
+   - evidence replacement
+   - retrospective artifacts masquerading as historical artifacts
+
+10. Unresolved identity behavior
+    - Ensure downstream analysis cannot silently drop, guess, or
+      current-map unresolved historical observations.
+
+ADVERSARIAL TESTING
+
+Add tests that intentionally attempt to violate the point-in-time boundary.
+
+Prefer tests demonstrating actual exploit paths over theoretical discussion.
+
+Classify findings:
+
+CRITICAL
+Future information can enter a historical assessment.
+
+HIGH
+A realistic path could corrupt point-in-time research integrity.
+
+MEDIUM
+Ambiguity or weak invariant could cause future research errors.
+
+LOW
+Documentation, ergonomics, or defensive-hardening issue.
+
+FIX POLICY
+
+- Fix confirmed CRITICAL or HIGH issues when the correction is small,
+  local, and clearly justified.
+- Add regression tests for every fixed issue.
+- Do not redesign the architecture merely for elegance.
+- For MEDIUM/LOW findings, document them unless a trivial safe fix exists.
+- Do not introduce KRX network acquisition or full legacy migration.
+
+IMPORTANT
+
+The current lack of immutable historical KRX artifacts with reliable
+availability timestamps is a known data limitation.
+
+Do not solve that limitation by using current master data as historical truth.
+
+OUTPUT
+
+Create:
+
+docs/audits/JOB-0006-point-in-time-leakage-audit.md
+
+The audit must contain:
+
+- audit scope
+- threat model
+- findings by severity
+- attempted exploit paths
+- tests added
+- fixes made
+- residual risks
+- unresolved data limitations
+- explicit verdict on whether the architecture is ready for a small
+  historical fixture experiment
+
+The verdict must be one of:
+
+READY_FOR_FIXTURE
+READY_WITH_RESTRICTIONS
+NOT_READY
+
+Do not claim readiness for the full three-year study.
+This audit only decides readiness for the next small historical fixture.
+
+QUALITY
+
+Run the complete pytest suite.
+Run git diff --check.
+
+Do not commit or push.
+
+FINAL RESPONSE
+
+Report:
+
+- actual model used
+- finding counts by severity
+- confirmed leakage paths
+- fixes made
+- total test result
+- audit verdict
+- residual risks
+- recommended next job
+"""
