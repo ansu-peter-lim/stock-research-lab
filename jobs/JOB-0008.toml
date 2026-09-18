@@ -1,0 +1,312 @@
+job_id = "JOB-0008"
+objective = "Acquire and preserve one genuine historical Telegram Top30 source artifact with verifiable provenance."
+model_tier = "standard"
+reasoning_tier = "medium"
+sandbox = "workspace-write"
+status = "pending"
+thread_id = ""
+created_at = ""
+completed_at = ""
+result_location = ""
+
+prompt = """
+Read all canonical Stock Research Lab documents and prior experiment/audit
+results before working.
+
+Review especially:
+
+- docs/historical-research-protocol.md
+- docs/top30-observation-contract.md
+- docs/audits/JOB-0006-point-in-time-leakage-audit.md
+- docs/experiments/JOB-0007-historical-fixture.md
+- docs/migration/legacy-inventory.md
+- src/research_contracts/top30.py
+- src/research_contracts/historical_fixture.py
+
+LEGACY REFERENCE
+
+D:/Project/stock-trading-system-reference
+
+Treat the legacy repository as strictly READ ONLY.
+
+Inspect the legacy Telegram acquisition/parser implementation, especially:
+
+- telegram_collect_3years.py
+- src/telegram_top30_parser
+- relevant tests/configuration
+
+Do not modify the legacy repository.
+
+LOCAL SECRET SOURCE
+
+D:/Project/research/.env
+
+The .env file is local-only and already excluded by .gitignore.
+
+SECURITY RULES
+
+The .env file may be used only as a runtime credential source.
+
+Never:
+
+- print secret values;
+- include secret values in Codex responses;
+- include secret values in terminal logs;
+- copy .env into another file or directory;
+- commit .env;
+- place credentials in fixtures;
+- place credentials in state.json;
+- place credentials in response.md;
+- place credentials in tests;
+- place credentials in exception messages;
+- place credentials in documentation.
+
+Determine required credential VARIABLE NAMES from the legacy implementation.
+
+If credentials are missing, report only the missing variable names.
+
+Never report their values.
+
+If Telegram session/authentication artifacts are created, ensure they are
+excluded from Git before continuing.
+
+Verify git ignore protection before acquisition.
+
+OBJECTIVE
+
+Acquire ONE genuine historical Top30 Telegram source sample and preserve it
+as an immutable local research artifact.
+
+This job is deliberately narrow.
+
+Do NOT collect the entire three-year history yet.
+
+Do NOT join future price data.
+
+Do NOT perform outcome analysis.
+
+Do NOT use current KRX master information to fill historical identities.
+
+ACQUISITION TARGET
+
+Select one historical Top30 report/date that is accessible through the
+existing Telegram acquisition mechanism.
+
+Prefer a date sufficiently old to represent the intended historical study
+and for which the original Telegram message metadata can still be retrieved.
+
+Use only a small sample:
+prefer one complete Top30 report from one historical cutoff/date.
+
+If no genuine historical report can be acquired safely, stop and document
+why rather than substituting synthetic data.
+
+SOURCE PRESERVATION
+
+Preserve the genuine acquired source artifact without silently rewriting
+its original content.
+
+Store an immutable/raw representation sufficient to audit:
+
+- Telegram message ID
+- channel/chat identifier in a non-secret form
+- message timestamp
+- edit timestamp if available
+- acquisition/ingestion timestamp
+- raw message content or canonical byte-preserved representation
+- byte length
+- SHA-256 digest
+- source type
+- acquisition implementation/version
+- availability evidence
+- provenance
+
+Clearly distinguish:
+
+SOURCE TIME
+when Telegram says the message existed/published;
+
+EDIT TIME
+when Telegram reports a later edit, if any;
+
+INGESTION TIME
+when this research system acquired it;
+
+AVAILABILITY CLAIM
+what can actually be proven about availability at the historical cutoff.
+
+Do not treat ingestion time as historical publication time.
+
+Do not invent edit/deletion history that Telegram cannot provide.
+
+AVAILABILITY SEMANTICS
+
+Be conservative.
+
+If the Telegram API proves the historical message timestamp but cannot prove
+that the current message bytes are exactly the bytes visible at the original
+cutoff, represent that limitation explicitly.
+
+Do not automatically claim that today's retrieved message content is an
+immutable historical artifact if edits may have occurred.
+
+If an edit timestamp is after the intended cutoff, the post-edit content must
+not silently become cutoff-visible historical evidence.
+
+If historical byte-level availability cannot be proven, classify the artifact
+appropriately and document the restriction.
+
+MANIFEST
+
+Create a deterministic manifest for the genuine source artifact using the
+JOB-0007 immutable fixture mechanism where appropriate.
+
+The manifest must bind:
+
+- artifact ID
+- Telegram source/message identity
+- preserved bytes/reference
+- byte length
+- SHA-256
+- source timestamp
+- edit timestamp
+- ingestion timestamp
+- availability state/time
+- provenance
+- acquisition version
+
+Byte modification must cause validation failure.
+
+PARSER INTEGRATION
+
+Run the minimum existing/new parser path needed to determine whether the
+genuine artifact can produce Top30 observations.
+
+Preserve exact source-observed stock names.
+
+Do not require every historical stock code to resolve.
+
+Unresolved identity is valid and preferable to retrospective guessing.
+
+IDENTITY BOUNDARY
+
+Use HistoricalIdentityBundle where identity evidence is genuinely available.
+
+Current KRX/master data must not be used as point-in-time evidence.
+
+Retrospective mappings, if useful for audit, must remain behind the
+retrospective boundary.
+
+ASSESSMENT FREEZE
+
+Only if the acquired source satisfies the existing point-in-time contract
+sufficiently for a restricted fixture experiment:
+
+produce a write-once frozen assessment using the JOB-0007 mechanism.
+
+If availability integrity is insufficient, do NOT force assessment creation.
+
+Instead preserve the raw artifact/manifest and report the blocking issue.
+
+NO OUTCOMES
+
+This job must not access or attach:
+
+- future OHLCV
+- +5/+10/+20/+60 returns
+- future sector performance
+- future labels
+- success/failure classifications
+
+TESTS
+
+Add focused tests proving at minimum:
+
+1. .env and secret/session artifacts remain Git-ignored;
+2. credential values are not persisted in generated research artifacts;
+3. genuine source digest validation works;
+4. byte modification fails manifest validation;
+5. Telegram source/edit/ingestion timestamps remain distinct;
+6. unknown edit/availability information remains explicit;
+7. parser preserves source-observed stock names;
+8. unresolved identities are preserved;
+9. current/retrospective mapping cannot become assessment-time identity;
+10. post-cutoff edit evidence cannot silently enter cutoff assessment;
+11. existing JOB-0006 adversarial tests still pass;
+12. existing JOB-0007 write-once tests still pass.
+
+DATA LOCATION
+
+Use a clear local research-data location under the target repository structure.
+
+Do not store secrets there.
+
+Keep the genuine source artifact small.
+
+Do not acquire bulk history in this job.
+
+DOCUMENTATION
+
+Create:
+
+docs/experiments/JOB-0008-genuine-telegram-source.md
+
+Document:
+
+- selected Telegram historical report/date
+- acquisition method
+- provenance
+- source timestamp
+- edit timestamp if available
+- ingestion timestamp
+- availability interpretation
+- whether current bytes can be proven cutoff-visible
+- parser result
+- observation count
+- resolved/unresolved identity counts if applicable
+- whether a frozen assessment was allowed
+- security checks
+- limitations
+
+READINESS VERDICT
+
+End with exactly one:
+
+GENUINE_FIXTURE_READY
+GENUINE_FIXTURE_READY_WITH_RESTRICTIONS
+SOURCE_ACQUIRED_BUT_NOT_CUTOFF_VERIFIED
+ACQUISITION_BLOCKED
+
+The verdict applies only to proceeding toward one small real historical
+outcome experiment.
+
+It does NOT authorize the full three-year study.
+
+QUALITY
+
+Run the complete pytest suite.
+Run git diff --check.
+
+Do not commit or push.
+
+FINAL RESPONSE
+
+Report:
+
+- requested model tier
+- actual model if telemetry exposes it
+- whether local credentials were successfully consumed WITHOUT exposing them
+- selected historical date/report
+- Telegram message ID
+- source/edit/ingestion timestamp status
+- artifact SHA-256
+- observation count
+- resolved/unresolved counts if applicable
+- whether assessment freeze was allowed
+- tests
+- readiness verdict
+- residual risks
+- recommended next job
+
+Never include credential values in the final response.
+"""

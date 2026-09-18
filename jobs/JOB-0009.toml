@@ -1,0 +1,375 @@
+job_id = "JOB-0009"
+objective = "Audit existing local Telegram Top30 artifacts and manifests for historical point-in-time research usability."
+model_tier = "standard"
+reasoning_tier = "medium"
+sandbox = "workspace-write"
+status = "pending"
+thread_id = ""
+created_at = ""
+completed_at = ""
+result_location = ""
+
+prompt = """
+Read all canonical Stock Research Lab documents and prior audit/experiment
+results first.
+
+Review especially:
+
+- docs/historical-research-protocol.md
+- docs/top30-observation-contract.md
+- docs/audits/JOB-0006-point-in-time-leakage-audit.md
+- docs/experiments/JOB-0007-historical-fixture.md
+- docs/experiments/JOB-0008-genuine-telegram-source.md
+- docs/migration/legacy-inventory.md
+
+TARGET REPOSITORY
+
+D:/Project/research
+
+LEGACY CODE REFERENCE
+
+D:/Project/stock-trading-system-reference
+
+Treat as strictly READ ONLY.
+
+LEGACY LOCAL DATA REPOSITORY
+
+D:/Project/stock
+
+Treat the entire legacy local repository/data tree as strictly READ ONLY.
+
+Do not modify, rename, normalize, move, delete, re-download, or regenerate
+any legacy artifact.
+
+Do not run Git clean/reset/checkout/pull against the legacy repositories.
+
+Do not use GitHub web requests.
+
+IMPORTANT CONTEXT
+
+Existing local assets appear to include historical Telegram Top30 files under
+a structure similar to:
+
+D:/Project/stock/data/telegram/daily
+
+with filenames such as:
+
+2023-09-01_07-36-30_15617.txt
+
+There are also existing manifest/data structures and historical Kiwoom/KRX
+data in the legacy project.
+
+A correction registry was previously used during Top30 parsing.
+
+Locate the authoritative local correction registry used by the legacy project
+rather than inventing or recreating corrections.
+
+Treat all corrections as a separate retrospective correction layer unless
+their historical availability can independently be proven.
+
+Do NOT rewrite raw artifacts using correction information.
+
+OBJECTIVE
+
+Determine whether existing local Telegram Top30 artifacts can serve as genuine
+historical source evidence for the new point-in-time research pipeline.
+
+This is an AUDIT / INVENTORY job.
+
+Do NOT migrate the full dataset.
+Do NOT perform future-price/outcome joins.
+Do NOT run the three-year study.
+Do NOT acquire new Telegram messages unless explicitly required by a later job.
+
+AUDIT SCOPE
+
+Inspect a SMALL representative sample first.
+
+At minimum select:
+
+- one early historical artifact from the available period;
+- one artifact associated with a known correction if identifiable;
+- one duplicate/multi-report case if identifiable;
+- relevant manifest entries for those artifacts.
+
+Do not scan or parse every file unless inexpensive metadata enumeration is
+required to understand the dataset structure.
+
+PART 1 — DATASET INVENTORY
+
+Determine:
+
+- earliest and latest Telegram artifact dates;
+- approximate artifact/file count;
+- directory organization;
+- filename convention;
+- message ID representation;
+- presence of manifests;
+- presence of digests;
+- presence of source timestamps;
+- presence of ingestion timestamps;
+- presence of edit timestamps;
+- presence of channel/chat identifiers;
+- presence of parser/acquisition version information;
+- presence of correction registries.
+
+Distinguish facts found in stored metadata from information inferred only from
+filenames.
+
+PART 2 — ARTIFACT PROVENANCE
+
+For each representative artifact determine, where evidence exists:
+
+- exact local path;
+- byte length;
+- SHA-256 of current local bytes;
+- Telegram message ID;
+- source/message timestamp;
+- edit timestamp;
+- ingestion/acquisition timestamp;
+- channel/source identity;
+- manifest linkage;
+- stored digest linkage;
+- acquisition implementation that created it;
+- whether current bytes can be tied to the stored digest;
+- whether historical availability at the intended cutoff is proven,
+  plausible-but-unverified, unknown, or contradicted.
+
+Do not invent missing metadata.
+
+PART 3 — ACQUISITION CHAIN
+
+Inspect legacy code to reconstruct the chain that created these files.
+
+Determine as far as evidence permits:
+
+Telegram
+    ->
+acquisition code
+    ->
+raw/local file
+    ->
+manifest
+    ->
+parser
+    ->
+processed Top30 data
+
+Identify concrete source files/functions responsible for each step.
+
+Determine whether acquisition preserved:
+
+- original message text;
+- Telegram message date;
+- edit date;
+- message ID;
+- collection time;
+- raw bytes or normalized text;
+- digest at acquisition time.
+
+PART 4 — BYTE / DIGEST INTEGRITY
+
+Where a legacy manifest/digest exists:
+
+- recompute SHA-256 without modifying the source;
+- compare with stored digest;
+- report match/mismatch.
+
+Where no historical digest exists:
+
+- current SHA-256 may be calculated for future integrity,
+  but clearly label it as CURRENT AUDIT DIGEST rather than historical proof.
+
+Never claim a newly calculated digest proves historical bytes.
+
+PART 5 — CORRECTION LAYER
+
+Locate and inspect the legacy Top30 correction registry.
+
+Classify correction types such as:
+
+- report-date correction;
+- duplicate/exclusion;
+- stock-name correction;
+- parsing correction;
+- other manual correction.
+
+For representative correction entries determine:
+
+- message ID linkage;
+- correction reason;
+- whether correction changes raw source interpretation;
+- whether correction is retrospective;
+- whether its availability at historical cutoff is known.
+
+Architectural rule:
+
+RAW SOURCE MUST REMAIN IMMUTABLE.
+
+Corrections must be represented conceptually as:
+
+raw source
+    +
+separate correction/enrichment layer
+
+Never rewrite raw Telegram evidence to incorporate a correction.
+
+PART 6 — POINT-IN-TIME CLASSIFICATION
+
+Classify each representative artifact into exactly one:
+
+A — CUTOFF_VERIFIED
+Strong evidence that the artifact content and availability are valid for the
+historical cutoff.
+
+B — SOURCE_VERIFIED_CONTENT_UNCERTAIN
+Telegram/source identity and historical timestamp are supported, but exact
+cutoff-visible bytes cannot be proven.
+
+C — LOCALLY_PRESERVED_PROVENANCE_LIMITED
+A genuine-looking legacy local artifact exists, but historical availability
+or acquisition provenance is insufficient.
+
+D — RETROSPECTIVE_ONLY
+Artifact/enrichment is useful only retrospectively.
+
+E — INVALID_OR_INCONSISTENT
+Evidence conflicts or integrity validation fails.
+
+Use conservative classification.
+
+PART 7 — COMPATIBILITY WITH NEW PIPELINE
+
+Determine whether representative legacy artifacts can be adapted into:
+
+immutable fixture manifest
+    ->
+Top30Observation
+    ->
+HistoricalIdentityBundle
+    ->
+AssessmentPayload
+    ->
+write-once frozen assessment
+
+without weakening JOB-0006 leakage protections.
+
+Do NOT force conversion if provenance is insufficient.
+
+PART 8 — EXISTING KRX/KIWOOM DATA
+
+Inventory only enough to determine whether the legacy local repository already
+contains useful historical daily market data that may later support outcome
+evaluation.
+
+Do NOT join it to Top30 assessments in this job.
+
+Report:
+
+- what types of KRX/Kiwoom daily data appear to exist;
+- date coverage if cheaply determinable;
+- whether provenance/manifests exist;
+- whether these should be audited separately before outcome use.
+
+Do not perform performance calculations.
+
+SECURITY
+
+Do not read or print secret values.
+
+Do not inspect .env contents.
+
+Do not print Telegram session contents.
+
+Session files may be identified by path/existence only when necessary.
+
+Never persist credentials into target artifacts, logs, tests, state, response,
+or documentation.
+
+OUTPUT
+
+Create:
+
+docs/audits/JOB-0009-legacy-historical-artifact-audit.md
+
+The report must contain:
+
+1. scope;
+2. legacy data inventory;
+3. representative artifacts;
+4. provenance chain;
+5. digest/integrity findings;
+6. correction-layer findings;
+7. point-in-time classifications;
+8. compatibility with the new fixture pipeline;
+9. KRX/Kiwoom historical-data inventory;
+10. risks and unknowns;
+11. recommended minimal migration/import strategy;
+12. recommended next job.
+
+Also create a SMALL machine-readable inventory under an appropriate
+research metadata location in the target repository.
+
+Do not copy bulk legacy data.
+
+The machine-readable inventory must reference legacy artifacts by path and
+digest rather than duplicate them.
+
+TESTS
+
+Add focused tests for any new inventory/provenance code.
+
+At minimum verify:
+
+- legacy source paths are treated read-only;
+- current audit digest is not mislabeled as historical digest;
+- correction metadata remains separate from raw source;
+- point-in-time classification is explicit;
+- missing availability metadata remains unknown;
+- representative manifest/digest validation behaves correctly;
+- no secret/session content enters generated metadata;
+- existing JOB-0006 and JOB-0007 protections continue to pass.
+
+READINESS VERDICT
+
+End with exactly one:
+
+LEGACY_ARTIFACTS_READY_FOR_REAL_FIXTURE
+LEGACY_ARTIFACTS_READY_WITH_RESTRICTIONS
+LEGACY_ARTIFACTS_REQUIRE_PROVENANCE_REPAIR
+LEGACY_ARTIFACTS_NOT_USABLE
+
+This verdict applies only to selecting one real historical fixture.
+
+It does NOT authorize outcome joining or the full three-year study.
+
+QUALITY
+
+Run the complete pytest suite.
+Run git diff --check.
+
+Keep implementation minimal.
+
+Do not commit or push.
+
+FINAL RESPONSE
+
+Report:
+
+- requested model tier;
+- actual model if telemetry exposes it;
+- legacy Telegram date range;
+- approximate artifact count;
+- representative artifacts audited;
+- correction registry found/not found;
+- historical digest availability;
+- integrity results;
+- point-in-time classification counts for audited samples;
+- whether existing KRX/Kiwoom historical data was found;
+- tests;
+- readiness verdict;
+- major residual risks;
+- recommended next job.
+
+Do not expose credentials or session contents.
+"""

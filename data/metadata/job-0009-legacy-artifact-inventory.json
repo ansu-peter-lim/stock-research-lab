@@ -1,0 +1,28 @@
+{
+  "schema_version": "job-0009-legacy-artifact-inventory-1",
+  "audit_scope": "small representative read-only inventory; no outcome joins or bulk migration",
+  "legacy_roots": [
+    {"path": "D:/Project/stock", "access": "read_only"},
+    {"path": "D:/Project/stock-trading-system-reference", "access": "read_only"}
+  ],
+  "telegram_inventory": {
+    "raw_directory": "D:/Project/stock/data/raw/telegram/daily",
+    "artifact_count": 782,
+    "filename_convention_inferred": "YYYY-MM-DD_HH-MM-SS_<telegram_message_id>.txt",
+    "earliest_filename": "2023-09-01_07-36-30_15617.txt",
+    "latest_filename": "2026-09-10_09-06-38_30934.txt",
+    "manifest_path": "D:/Project/stock/data/processed/telegram/top30_report_manifest.csv",
+    "manifest_digest_kind": "processed_manifest_digest; acquisition-time storage is not evidenced",
+    "source_channel_configured_in_legacy_code": "balanceasset",
+    "source_chat_identifier": null,
+    "ingestion_timestamp": null,
+    "edit_timestamp": null,
+    "acquisition_version": null
+  },
+  "representative_artifacts": [
+    {"source_path": "D:/Project/stock/data/raw/telegram/daily/2023-09-01_07-36-30_15617.txt", "source_access": "read_only", "byte_length": 8713, "current_audit_sha256": "67125a36f13ca6dcd300e4814cfb478332e16295f7ecf80e1a629088bbf5c3f4", "current_audit_digest_kind": "CURRENT_AUDIT_DIGEST", "stored_digest": "67125a36f13ca6dcd300e4814cfb478332e16295f7ecf80e1a629088bbf5c3f4", "stored_digest_matches_current": true, "historical_digest_available": false, "telegram_message_id": 15617, "source_timestamp": "2023-09-01T07:36:30Z", "edit_timestamp": null, "ingested_at": null, "classification": "LOCALLY_PRESERVED_PROVENANCE_LIMITED"},
+    {"source_path": "D:/Project/stock/data/raw/telegram/daily/2024-02-16_09-08-41_17910.txt", "source_access": "read_only", "byte_length": 8384, "current_audit_sha256": "bc6a222a10241f34ce62267a40ab5f6a28ebd591422d9e25e6fde6d3c6d0c65c", "current_audit_digest_kind": "CURRENT_AUDIT_DIGEST", "stored_digest": "bc6a222a10241f34ce62267a40ab5f6a28ebd591422d9e25e6fde6d3c6d0c65c", "stored_digest_matches_current": true, "historical_digest_available": false, "telegram_message_id": 17910, "source_timestamp": "2024-02-16T09:08:41Z", "edit_timestamp": null, "ingested_at": null, "classification": "LOCALLY_PRESERVED_PROVENANCE_LIMITED"},
+    {"source_path": "D:/Project/stock/data/raw/telegram/daily/2025-12-02_08-37-44_26652.txt", "source_access": "read_only", "byte_length": 8802, "current_audit_sha256": "a6b7d0acb470f51ad10dc2021f125e8ca5d5563b14bb51695c430ab96e939f6d", "current_audit_digest_kind": "CURRENT_AUDIT_DIGEST", "stored_digest": "a6b7d0acb470f51ad10dc2021f125e8ca5d5563b14bb51695c430ab96e939f6d", "stored_digest_matches_current": true, "historical_digest_available": false, "telegram_message_id": 26652, "source_timestamp": "2025-12-02T08:37:44Z", "edit_timestamp": null, "ingested_at": null, "classification": "LOCALLY_PRESERVED_PROVENANCE_LIMITED"}
+  ],
+  "correction_layer": {"registry_path": "D:/Project/stock/data/manual/telegram/top30_corrections.csv", "access": "read_only", "boundary": "retrospective", "raw_sources_rewritten": false, "representative_entries": [{"telegram_message_id": 17910, "action": "correct_report_date", "reason": "author date typo confirmed manually"}, {"telegram_message_id": 26652, "action": "exclude_report", "reason": "exact duplicate of 26650"}]}
+}

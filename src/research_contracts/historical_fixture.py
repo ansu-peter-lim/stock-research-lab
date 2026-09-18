@@ -71,6 +71,10 @@ class FixtureManifestEntry:
     available_at: datetime | None
     artifact_type: str
     parser_version: str
+    source_identity: str = ""
+    edit_timestamp: datetime | None = None
+    availability_evidence: str = ""
+    acquisition_version: str = ""
 
     def __post_init__(self) -> None:
         if not self.fixture_id or not self.raw_path or not self.provenance or not self.artifact_type:
@@ -81,6 +85,8 @@ class FixtureManifestEntry:
             object.__setattr__(self, "availability_state", AvailabilityState(self.availability_state))
         if self.source_timestamp is not None:
             object.__setattr__(self, "source_timestamp", _utc(self.source_timestamp, "source_timestamp"))
+        if self.edit_timestamp is not None:
+            object.__setattr__(self, "edit_timestamp", _utc(self.edit_timestamp, "edit_timestamp"))
         object.__setattr__(self, "ingested_at", _utc(self.ingested_at, "ingested_at"))
         if self.availability_state is AvailabilityState.KNOWN:
             if self.available_at is None:
@@ -90,7 +96,7 @@ class FixtureManifestEntry:
             raise ValueError("unknown availability must not invent available_at")
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        result = {
             "fixture_id": self.fixture_id, "raw_path": self.raw_path,
             "byte_length": self.byte_length, "content_sha256": self.content_sha256,
             "provenance": self.provenance,
@@ -100,6 +106,14 @@ class FixtureManifestEntry:
             "available_at": _iso(self.available_at) if self.available_at else None,
             "artifact_type": self.artifact_type, "parser_version": self.parser_version,
         }
+        # Preserve JOB-0007's deterministic serialized bytes; newer Telegram
+        # artifacts include these fields only when the adapter has evidence.
+        if self.source_identity:
+            result["source_identity"] = self.source_identity
+            result["edit_timestamp"] = _iso(self.edit_timestamp) if self.edit_timestamp else None
+            result["availability_evidence"] = self.availability_evidence
+            result["acquisition_version"] = self.acquisition_version
+        return result
 
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> "FixtureManifestEntry":
@@ -108,7 +122,9 @@ class FixtureManifestEntry:
                    _parse_datetime(value["source_timestamp"]) if value.get("source_timestamp") else None,
                    _parse_datetime(value["ingested_at"]), value["availability_state"],
                    _parse_datetime(value["available_at"]) if value.get("available_at") else None,
-                   value["artifact_type"], value["parser_version"])
+                   value["artifact_type"], value["parser_version"], value.get("source_identity", ""),
+                   _parse_datetime(value["edit_timestamp"]) if value.get("edit_timestamp") else None,
+                   value.get("availability_evidence", ""), value.get("acquisition_version", ""))
 
 
 @dataclass(frozen=True)
@@ -163,6 +179,8 @@ def parse_top30_fixture(manifest: FixtureManifest, root: Path, fixture_id: str) 
         raise ValueError("unsupported fixture parser version")
     if entry.availability_state is not AvailabilityState.KNOWN or entry.available_at is None:
         raise ValueError("fixture availability is unknown; it cannot enter an assessment")
+    if entry.edit_timestamp is not None and entry.edit_timestamp > entry.available_at:
+        raise ValueError("fixture current message was edited after cutoff; it cannot enter an assessment")
     lines = (root / entry.raw_path).read_text(encoding="utf-8").splitlines()
     if not lines or not lines[0].startswith("observation_date="):
         raise ValueError("fixture header must state observation_date")

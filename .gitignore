@@ -18,6 +18,11 @@ ENV/
 secrets/
 credentials/
 
+# Local Telegram authentication artifacts
+*.session
+*.session-journal
+telegram_sessions/
+
 # Research data and generated outputs (keep schemas/README files tracked)
 data/raw/*
 data/processed/*
