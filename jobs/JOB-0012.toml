@@ -1,0 +1,131 @@
+job_id = "JOB-0012"
+objective = "Define the evidence policy for admitting historical Telegram artifacts into point-in-time research."
+model_tier = "advanced"
+reasoning_tier = "high"
+sandbox = "workspace-write"
+status = "pending"
+thread_id = ""
+created_at = ""
+completed_at = ""
+result_location = ""
+
+prompt = """
+VALIDATION LEVEL: FAST
+
+Act as research-integrity reviewer.
+
+Read the canonical research protocol and JOB-0006 through JOB-0011
+audit/experiment documents. Inspect implementation only where needed.
+
+PRIMARY QUESTION
+
+Can evidence classified as
+B_SOURCE_VERIFIED_CONTENT_STRONGLY_SUPPORTED
+be admitted into the three-year historical Top30 research?
+
+Current B evidence for message 15617 includes:
+
+- genuine Telegram message identity verified;
+- Telegram source timestamp verified;
+- current Telegram content canonically matches the independently preserved
+  legacy local artifact;
+- legacy artifact matches the existing processed-manifest hash;
+- no edit timestamp is currently reported;
+- exact acquisition-time digest/timestamp and historical revision history
+  remain unavailable.
+
+Do not require mathematically perfect historical proof if that standard would
+make the practical research impossible.
+
+Instead define a conservative, reproducible evidence policy.
+
+REQUIRED DECISIONS
+
+Define policy for evidence classes A/B/C/D/E:
+
+1. whether each class may enter:
+   - parsing only;
+   - historical assessment;
+   - outcome evaluation;
+   - full three-year walk-forward research;
+
+2. required restrictions for admitted classes;
+
+3. confidence/evidence metadata that must remain attached permanently;
+
+4. whether unresolved stock identity is allowed;
+
+5. whether retrospective corrections may be applied and, if so, at which
+   research stage;
+
+6. whether B evidence may be promoted from quarantine for assessment without
+   pretending it is A-grade evidence.
+
+Prevent survivorship/look-ahead leakage and silent evidence upgrading.
+
+MESSAGE 15617 DECISION
+
+Give an explicit policy decision for the existing JOB-0011 fixture:
+
+PROMOTE_WITH_RESTRICTIONS
+KEEP_QUARANTINED
+REQUIRE_ONE_SPECIFIC_ADDITIONAL_EVIDENCE
+
+If additional evidence is required, name the exact evidence required.
+Do not recommend open-ended provenance investigation.
+
+IMPLEMENTATION
+
+If the policy supports PROMOTE_WITH_RESTRICTIONS:
+
+- implement the smallest explicit policy gate required to permit B-grade
+  evidence into assessment;
+- preserve evidence_class=B and all limitations in derived artifacts;
+- do not change the underlying provenance classification;
+- do not silently convert B to A.
+
+If policy rejects promotion, do not implement a bypass.
+
+Do not add outcome data in this job.
+
+VALIDATION
+
+Run only directly affected policy/contract tests plus core point-in-time
+leakage tests.
+
+Do NOT run the entire test suite unless the change affects shared foundations
+or focused tests reveal a regression.
+
+Run git diff --check.
+
+DOCUMENTATION
+
+Create:
+
+docs/policies/historical-evidence-admission-policy.md
+
+Record:
+
+- A/B/C/D/E admission matrix;
+- restrictions;
+- confidence semantics;
+- correction policy;
+- unresolved-identity policy;
+- decision for message 15617;
+- rationale;
+- known limitations.
+
+FINAL VERDICT
+
+End with exactly one:
+
+B_EVIDENCE_ADMITTED_WITH_RESTRICTIONS
+B_EVIDENCE_NOT_ADMITTED
+ADDITIONAL_SPECIFIC_EVIDENCE_REQUIRED
+
+Do not authorize bulk three-year execution yet.
+
+Report the recommended next step concisely.
+
+Do not commit or push.
+"""

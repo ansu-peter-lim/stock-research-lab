@@ -29,6 +29,16 @@ from .pre_assessment import (
     parse_restricted_telegram_fixture,
     write_preassessment_artifact,
 )
+from .evidence_admission import (
+    ADMISSION_MATRIX,
+    POLICY_VERSION as EVIDENCE_ADMISSION_POLICY_VERSION,
+    EvidenceAdmissionError,
+    PolicyAdmittedAssessmentInput,
+    ResearchStage,
+    admit_preassessment_for_historical_assessment,
+    is_admitted,
+    write_policy_admission,
+)
 
 __all__ = [
     "AssessmentPayload",
@@ -54,4 +64,12 @@ __all__ = [
     "QuarantineError",
     "parse_restricted_telegram_fixture",
     "write_preassessment_artifact",
+    "ADMISSION_MATRIX",
+    "EVIDENCE_ADMISSION_POLICY_VERSION",
+    "EvidenceAdmissionError",
+    "PolicyAdmittedAssessmentInput",
+    "ResearchStage",
+    "admit_preassessment_for_historical_assessment",
+    "is_admitted",
+    "write_policy_admission",
 ]

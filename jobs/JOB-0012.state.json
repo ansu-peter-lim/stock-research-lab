@@ -1,0 +1,30 @@
+{
+  "job_id": "JOB-0012",
+  "objective": "Define the evidence policy for admitting historical Telegram artifacts into point-in-time research.",
+  "reasoning_tier": "high",
+  "prompt": "VALIDATION LEVEL: FAST\n\nAct as research-integrity reviewer.\n\nRead the canonical research protocol and JOB-0006 through JOB-0011\naudit/experiment documents. Inspect implementation only where needed.\n\nPRIMARY QUESTION\n\nCan evidence classified as\nB_SOURCE_VERIFIED_CONTENT_STRONGLY_SUPPORTED\nbe admitted into the three-year historical Top30 research?\n\nCurrent B evidence for message 15617 includes:\n\n- genuine Telegram message identity verified;\n- Telegram source timestamp verified;\n- current Telegram content canonically matches the independently preserved\n  legacy local artifact;\n- legacy artifact matches the existing processed-manifest hash;\n- no edit timestamp is currently reported;\n- exact acquisition-time digest/timestamp and historical revision history\n  remain unavailable.\n\nDo not require mathematically perfect historical proof if that standard would\nmake the practical research impossible.\n\nInstead define a conservative, reproducible evidence policy.\n\nREQUIRED DECISIONS\n\nDefine policy for evidence classes A/B/C/D/E:\n\n1. whether each class may enter:\n   - parsing only;\n   - historical assessment;\n   - outcome evaluation;\n   - full three-year walk-forward research;\n\n2. required restrictions for admitted classes;\n\n3. confidence/evidence metadata that must remain attached permanently;\n\n4. whether unresolved stock identity is allowed;\n\n5. whether retrospective corrections may be applied and, if so, at which\n   research stage;\n\n6. whether B evidence may be promoted from quarantine for assessment without\n   pretending it is A-grade evidence.\n\nPrevent survivorship/look-ahead leakage and silent evidence upgrading.\n\nMESSAGE 15617 DECISION\n\nGive an explicit policy decision for the existing JOB-0011 fixture:\n\nPROMOTE_WITH_RESTRICTIONS\nKEEP_QUARANTINED\nREQUIRE_ONE_SPECIFIC_ADDITIONAL_EVIDENCE\n\nIf additional evidence is required, name the exact evidence required.\nDo not recommend open-ended provenance investigation.\n\nIMPLEMENTATION\n\nIf the policy supports PROMOTE_WITH_RESTRICTIONS:\n\n- implement the smallest explicit policy gate required to permit B-grade\n  evidence into assessment;\n- preserve evidence_class=B and all limitations in derived artifacts;\n- do not change the underlying provenance classification;\n- do not silently convert B to A.\n\nIf policy rejects promotion, do not implement a bypass.\n\nDo not add outcome data in this job.\n\nVALIDATION\n\nRun only directly affected policy/contract tests plus core point-in-time\nleakage tests.\n\nDo NOT run the entire test suite unless the change affects shared foundations\nor focused tests reveal a regression.\n\nRun git diff --check.\n\nDOCUMENTATION\n\nCreate:\n\ndocs/policies/historical-evidence-admission-policy.md\n\nRecord:\n\n- A/B/C/D/E admission matrix;\n- restrictions;\n- confidence semantics;\n- correction policy;\n- unresolved-identity policy;\n- decision for message 15617;\n- rationale;\n- known limitations.\n\nFINAL VERDICT\n\nEnd with exactly one:\n\nB_EVIDENCE_ADMITTED_WITH_RESTRICTIONS\nB_EVIDENCE_NOT_ADMITTED\nADDITIONAL_SPECIFIC_EVIDENCE_REQUIRED\n\nDo not authorize bulk three-year execution yet.\n\nReport the recommended next step concisely.\n\nDo not commit or push.\n",
+  "sandbox": "workspace-write",
+  "model_tier": "advanced",
+  "status": "accepted",
+  "thread_id": "01a0b554-205f-7bd1-92ca-cf1e8b9578ae",
+  "created_at": "2026-09-18T16:23:03.147170+00:00",
+  "started_at": "2026-09-18T16:23:03.147192+00:00",
+  "completed_at": "2026-09-18T16:31:24.243226+00:00",
+  "result_location": "jobs/results/JOB-0012/response.md",
+  "model": "gpt-5.6-sol",
+  "current_turn_tokens": null,
+  "cumulative_tokens": null,
+  "usage_recorded_at": null,
+  "usage_events": [],
+  "progress": null,
+  "activity": [
+    {
+      "timestamp": "2026-09-18T16:23:04.857608+00:00",
+      "message": "Codex thread started"
+    },
+    {
+      "timestamp": "2026-09-18T16:30:46.617419+00:00",
+      "message": "Codex run completed; awaiting review"
+    }
+  ]
+}
