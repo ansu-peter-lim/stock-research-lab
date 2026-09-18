@@ -13,5 +13,8 @@ point-in-time Top30 universe snapshots. The lab is deliberately separate from
 4. Record experiments and promote only replicated findings to
    [`knowledge/`](knowledge/README.md).
 
-The current bootstrap establishes policy and structure only. It does not
-migrate legacy code, acquire historical data, or implement a strategy.
+For approved implementation work, use the file-backed runner described in
+[`orchestrator/README.md`](orchestrator/README.md).
+
+The bootstrap establishes policy and orchestration only. It does not migrate
+legacy code, acquire historical data, or implement a strategy.

@@ -1,0 +1,11 @@
+job_id = "EXAMPLE-001"
+objective = "Replace this with a bounded, reviewable objective."
+reasoning_tier = "low"
+# Omit sandbox for the safe default; use workspace-write only when required.
+sandbox = "read-only"
+status = "pending"
+thread_id = ""
+prompt = "Read the canonical project documents and perform the approved objective. Report evidence, tests, limitations, and follow-up questions."
+created_at = ""
+completed_at = ""
+result_location = ""
