@@ -20,9 +20,32 @@ verified `gpt-5.6-terra` model. The four tiers are `economy` →
 `gpt-5.6-luna`, `standard` → `gpt-5.6-terra`, `advanced` → `gpt-5.6-sol`, and
 `critical` → `gpt-6-astra`. Runners can report optional state with
 `JobStore.record_progress(...)` and `JobStore.record_activity(...)`; omitted
-progress remains omitted. Model and token fields are persisted only when the
-installed Codex SDK exposes them, otherwise the monitor displays `N/A`. The
-monitor displays model tier, resolved model, and reasoning tier separately.
+progress remains omitted. The one-shot monitor shows compact runtime telemetry
+without re-running a job or scanning result output.
+
+Telemetry sources and limits:
+
+- The immutable job specification supplies `model_tier`, which resolves to the
+  requested model, reasoning tier, and sandbox. The state records requested
+  and resolved model separately (they currently match under the four-tier
+  policy).
+- The installed `openai_codex` SDK (0.154.0) supplies `TurnResult.usage.last`
+  when the App Server emits usage: input, output, total, and—when supplied—
+  cached-input and reasoning-output tokens. Job and today's totals sum only
+  recorded turn totals from this orchestrator; no quota or missing value is
+  estimated.
+- SDK App Server turn results supply turn start/end and duration, plus completed
+  command-item durations. Only aggregate local command and recognizable test
+  command durations are saved; command text, output, and arguments are never
+  persisted as telemetry.
+- Local orchestrator timing supplies total elapsed wall time.
+
+SDK 0.154.0's completed-turn and `TurnResult` schemas do **not** expose the
+actual runtime model identifier. Therefore `Actual Model` is deliberately
+`N/A` unless a future SDK result explicitly provides `actual_model` or
+`runtime_model`; the requested/resolved model is never presented as actual.
+Telemetry collection is best-effort: a telemetry exception leaves a successful
+Codex job successful and records only a concise warning.
 
 Lifecycle commands always load the state snapshot first, so a pending status in
 the TOML does not prevent accepting or reworking a job whose runtime state has

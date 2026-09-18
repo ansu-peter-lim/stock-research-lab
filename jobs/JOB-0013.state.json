@@ -1,0 +1,45 @@
+{
+  "job_id": "JOB-0013",
+  "objective": "Add lightweight Codex App Server telemetry for actual model, token usage, and local execution timing.",
+  "reasoning_tier": "medium",
+  "prompt": "VALIDATION LEVEL: FAST\n\nRead the existing orchestrator implementation and operating protocol.\nDo not re-read unrelated research/data files unless required.\n\nOBJECTIVE\n\nImprove Stock Research Lab monitoring using telemetry exposed by the\ninstalled Codex SDK / underlying App Server.\n\nCurrent problems:\n\n- actual Model displays N/A;\n- token usage displays N/A;\n- requested model tier is sometimes missing from Codex final reports;\n- we cannot distinguish Codex/model time from slow local execution time.\n\nThis is a SMALL infrastructure job.\nDo not modify research contracts, historical data, or research methodology.\n\nPRIORITY 1 \u2014 ACTUAL MODEL\n\nDetermine from the installed openai-codex SDK and underlying App Server\nevents/metadata how to obtain the actual model used for a turn.\n\nDo not guess.\n\nPersist when available:\n\n- requested model_tier;\n- resolved/requested model identifier;\n- actual runtime model identifier;\n- reasoning effort.\n\nClearly distinguish requested/resolved model from runtime-confirmed model.\n\nIf actual runtime model is genuinely unavailable, preserve N/A and document\nthe exact limitation.\n\nPRIORITY 2 \u2014 TOKEN USAGE\n\nInspect SDK/App Server turn/event telemetry for real token usage.\n\nCapture only values actually exposed by the runtime.\n\nWhere available persist:\n\n- current turn input tokens;\n- current turn output tokens;\n- current turn total tokens;\n- current job cumulative tokens;\n- today's cumulative tokens for jobs recorded by THIS orchestrator only.\n\nDo NOT estimate values.\nDo NOT infer ChatGPT Pro weekly quota.\nDo NOT fabricate missing token counts.\n\nIf App Server exposes cached/reasoning token detail cheaply, preserve it only\nif straightforward. Do not expand scope merely to obtain optional detail.\n\nPRIORITY 3 \u2014 ELAPSED / LOCAL EXECUTION TIMING\n\nPersist lightweight timing sufficient to identify PC-side bottlenecks:\n\n- job start;\n- Codex turn start/end;\n- total elapsed;\n- local command/tool execution duration when runtime events expose it;\n- test-command duration when identifiable.\n\nDo not build a profiler.\n\nAggregate only useful high-level values.\n\nPRIORITY 4 \u2014 MONITOR\n\nKeep:\n\n    python -m orchestrator monitor\n\nExtend its concise display approximately to:\n\nStock Research Lab Monitor\n\nCurrent Job\n  ID\n  Status\n  Model Tier\n  Requested Model\n  Actual Model\n  Reasoning\n  Sandbox\n  Thread\n  Elapsed\n\nUsage\n  Turn input\n  Turn output\n  Turn total\n  Job total\n  Today total\n\nExecution\n  Codex elapsed\n  Local command elapsed\n  Test elapsed\n\nRecent Activity\n  ...\n\nDisplay N/A for unavailable values.\n\nDo not make the monitor continuously refresh by default.\nPreserve one-shot behavior.\n\nPRIORITY 5 \u2014 EVENT COLLECTION\n\nPrefer using the existing Python SDK/App Server integration rather than\nlaunching a second independent Codex process.\n\nIf the Python SDK already exposes sufficient event/turn metadata, use it.\n\nIf direct App Server event subscription is required:\n\n- keep the integration minimal;\n- reuse the SDK-managed Codex runtime where practical;\n- do not build a generalized App Server client;\n- do not build a web UI;\n- do not add a database;\n- do not add a daemon/service;\n- do not add a queue.\n\nDo not duplicate Codex turns merely to collect telemetry.\n\nPERFORMANCE REQUIREMENT\n\nTelemetry must not materially slow normal jobs.\n\nAvoid:\n\n- repeated repository scans;\n- expensive log parsing;\n- polling loops;\n- large event archives;\n- storing full command output merely for telemetry.\n\nPersist compact structured telemetry only.\n\nFAIL-SAFE REQUIREMENT\n\nTelemetry failure must NOT cause a successful research/Codex job to fail.\n\nIf telemetry cannot be collected:\n\n- record N/A;\n- record a concise telemetry warning;\n- preserve the actual job result.\n\nSECURITY\n\nNever capture or persist:\n\n- .env contents;\n- credentials;\n- authentication tokens;\n- Telegram session contents;\n- brokerage/account information;\n- secret environment-variable values.\n\nCommand telemetry must avoid persisting secret-bearing command arguments or\nenvironment dumps.\n\nMODEL POLICY\n\nPreserve the existing four-tier policy:\n\neconomy   -> Luna\nstandard  -> Terra\nadvanced  -> Sol\ncritical  -> Astra\n\nDo not change model policy in this job.\n\nDo not enable xhigh automatically.\n\nTESTS \u2014 FAST ONLY\n\nRun only orchestrator/telemetry/monitor tests affected by this change.\n\nAdd focused tests for:\n\n1. requested/resolved/actual model distinction;\n2. actual-model N/A fallback;\n3. real token telemetry persistence when supplied;\n4. token N/A fallback;\n5. job/day aggregation from recorded usage;\n6. elapsed timing;\n7. monitor rendering;\n8. telemetry failure does not fail the job;\n9. secret values are not persisted.\n\nDo NOT run the entire research test suite.\n\nRun git diff --check.\n\nDOCUMENTATION\n\nUpdate only the relevant orchestrator documentation.\n\nDocument exactly which telemetry comes from:\n\n- job specification;\n- SDK;\n- App Server/runtime events;\n- local orchestrator timing.\n\nDocument any unavailable fields.\n\nFINAL RESPONSE\n\nBe concise.\n\nReport:\n\n- requested model tier;\n- resolved/requested model;\n- whether actual runtime model is now available;\n- which token fields are now available;\n- which timing fields are available;\n- files changed;\n- focused tests and duration;\n- telemetry overhead/limitations;\n- recommended next step.\n\nDo not commit or push.\n",
+  "sandbox": "workspace-write",
+  "model_tier": "standard",
+  "status": "accepted",
+  "thread_id": "01a0b55f-0aba-71d3-97f2-2cab4665ee3f",
+  "created_at": "2026-09-18T16:34:58.507989+00:00",
+  "started_at": "2026-09-18T16:34:58.508014+00:00",
+  "completed_at": "2026-09-18T16:40:20.390692+00:00",
+  "result_location": "jobs/results/JOB-0013/response.md",
+  "model": "gpt-5.6-terra",
+  "requested_model": null,
+  "resolved_model": null,
+  "actual_model": null,
+  "current_turn_input_tokens": null,
+  "current_turn_output_tokens": null,
+  "current_turn_total_tokens": null,
+  "current_turn_cached_input_tokens": null,
+  "current_turn_reasoning_output_tokens": null,
+  "current_turn_tokens": null,
+  "cumulative_tokens": null,
+  "usage_recorded_at": null,
+  "usage_events": [],
+  "turn_started_at": null,
+  "turn_completed_at": null,
+  "codex_elapsed_ms": null,
+  "local_command_elapsed_ms": null,
+  "test_elapsed_ms": null,
+  "total_elapsed_ms": null,
+  "telemetry_warning": null,
+  "progress": null,
+  "activity": [
+    {
+      "timestamp": "2026-09-18T16:35:00.182866+00:00",
+      "message": "Codex thread started"
+    },
+    {
+      "timestamp": "2026-09-18T16:39:09.524144+00:00",
+      "message": "Codex run completed; awaiting review"
+    }
+  ]
+}

@@ -1,0 +1,248 @@
+job_id = "JOB-0013"
+objective = "Add lightweight Codex App Server telemetry for actual model, token usage, and local execution timing."
+model_tier = "standard"
+reasoning_tier = "medium"
+sandbox = "workspace-write"
+status = "pending"
+thread_id = ""
+created_at = ""
+completed_at = ""
+result_location = ""
+
+prompt = """
+VALIDATION LEVEL: FAST
+
+Read the existing orchestrator implementation and operating protocol.
+Do not re-read unrelated research/data files unless required.
+
+OBJECTIVE
+
+Improve Stock Research Lab monitoring using telemetry exposed by the
+installed Codex SDK / underlying App Server.
+
+Current problems:
+
+- actual Model displays N/A;
+- token usage displays N/A;
+- requested model tier is sometimes missing from Codex final reports;
+- we cannot distinguish Codex/model time from slow local execution time.
+
+This is a SMALL infrastructure job.
+Do not modify research contracts, historical data, or research methodology.
+
+PRIORITY 1 — ACTUAL MODEL
+
+Determine from the installed openai-codex SDK and underlying App Server
+events/metadata how to obtain the actual model used for a turn.
+
+Do not guess.
+
+Persist when available:
+
+- requested model_tier;
+- resolved/requested model identifier;
+- actual runtime model identifier;
+- reasoning effort.
+
+Clearly distinguish requested/resolved model from runtime-confirmed model.
+
+If actual runtime model is genuinely unavailable, preserve N/A and document
+the exact limitation.
+
+PRIORITY 2 — TOKEN USAGE
+
+Inspect SDK/App Server turn/event telemetry for real token usage.
+
+Capture only values actually exposed by the runtime.
+
+Where available persist:
+
+- current turn input tokens;
+- current turn output tokens;
+- current turn total tokens;
+- current job cumulative tokens;
+- today's cumulative tokens for jobs recorded by THIS orchestrator only.
+
+Do NOT estimate values.
+Do NOT infer ChatGPT Pro weekly quota.
+Do NOT fabricate missing token counts.
+
+If App Server exposes cached/reasoning token detail cheaply, preserve it only
+if straightforward. Do not expand scope merely to obtain optional detail.
+
+PRIORITY 3 — ELAPSED / LOCAL EXECUTION TIMING
+
+Persist lightweight timing sufficient to identify PC-side bottlenecks:
+
+- job start;
+- Codex turn start/end;
+- total elapsed;
+- local command/tool execution duration when runtime events expose it;
+- test-command duration when identifiable.
+
+Do not build a profiler.
+
+Aggregate only useful high-level values.
+
+PRIORITY 4 — MONITOR
+
+Keep:
+
+    python -m orchestrator monitor
+
+Extend its concise display approximately to:
+
+Stock Research Lab Monitor
+
+Current Job
+  ID
+  Status
+  Model Tier
+  Requested Model
+  Actual Model
+  Reasoning
+  Sandbox
+  Thread
+  Elapsed
+
+Usage
+  Turn input
+  Turn output
+  Turn total
+  Job total
+  Today total
+
+Execution
+  Codex elapsed
+  Local command elapsed
+  Test elapsed
+
+Recent Activity
+  ...
+
+Display N/A for unavailable values.
+
+Do not make the monitor continuously refresh by default.
+Preserve one-shot behavior.
+
+PRIORITY 5 — EVENT COLLECTION
+
+Prefer using the existing Python SDK/App Server integration rather than
+launching a second independent Codex process.
+
+If the Python SDK already exposes sufficient event/turn metadata, use it.
+
+If direct App Server event subscription is required:
+
+- keep the integration minimal;
+- reuse the SDK-managed Codex runtime where practical;
+- do not build a generalized App Server client;
+- do not build a web UI;
+- do not add a database;
+- do not add a daemon/service;
+- do not add a queue.
+
+Do not duplicate Codex turns merely to collect telemetry.
+
+PERFORMANCE REQUIREMENT
+
+Telemetry must not materially slow normal jobs.
+
+Avoid:
+
+- repeated repository scans;
+- expensive log parsing;
+- polling loops;
+- large event archives;
+- storing full command output merely for telemetry.
+
+Persist compact structured telemetry only.
+
+FAIL-SAFE REQUIREMENT
+
+Telemetry failure must NOT cause a successful research/Codex job to fail.
+
+If telemetry cannot be collected:
+
+- record N/A;
+- record a concise telemetry warning;
+- preserve the actual job result.
+
+SECURITY
+
+Never capture or persist:
+
+- .env contents;
+- credentials;
+- authentication tokens;
+- Telegram session contents;
+- brokerage/account information;
+- secret environment-variable values.
+
+Command telemetry must avoid persisting secret-bearing command arguments or
+environment dumps.
+
+MODEL POLICY
+
+Preserve the existing four-tier policy:
+
+economy   -> Luna
+standard  -> Terra
+advanced  -> Sol
+critical  -> Astra
+
+Do not change model policy in this job.
+
+Do not enable xhigh automatically.
+
+TESTS — FAST ONLY
+
+Run only orchestrator/telemetry/monitor tests affected by this change.
+
+Add focused tests for:
+
+1. requested/resolved/actual model distinction;
+2. actual-model N/A fallback;
+3. real token telemetry persistence when supplied;
+4. token N/A fallback;
+5. job/day aggregation from recorded usage;
+6. elapsed timing;
+7. monitor rendering;
+8. telemetry failure does not fail the job;
+9. secret values are not persisted.
+
+Do NOT run the entire research test suite.
+
+Run git diff --check.
+
+DOCUMENTATION
+
+Update only the relevant orchestrator documentation.
+
+Document exactly which telemetry comes from:
+
+- job specification;
+- SDK;
+- App Server/runtime events;
+- local orchestrator timing.
+
+Document any unavailable fields.
+
+FINAL RESPONSE
+
+Be concise.
+
+Report:
+
+- requested model tier;
+- resolved/requested model;
+- whether actual runtime model is now available;
+- which token fields are now available;
+- which timing fields are available;
+- files changed;
+- focused tests and duration;
+- telemetry overhead/limitations;
+- recommended next step.
+
+Do not commit or push.
+"""

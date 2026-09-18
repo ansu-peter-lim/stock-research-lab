@@ -19,6 +19,22 @@ class UsageResult:
     usage = {"total_tokens": 17}
 
 
+class TelemetryResult:
+    final_response = "done"
+    actual_model = "runtime-confirmed-model"
+    started_at = 1_700_000_000
+    completed_at = 1_700_000_002
+    duration_ms = 2000
+    usage = {"last": {"input_tokens": 11, "output_tokens": 7, "total_tokens": 18,
+                        "cached_input_tokens": 3, "reasoning_output_tokens": 2}}
+    items = [
+        {"type": "commandExecution", "command": "python -m pytest tests/test_orchestrator.py",
+         "duration_ms": 400},
+        {"type": "commandExecution", "command": "secret-tool --token super-secret-value",
+         "duration_ms": 30},
+    ]
+
+
 class FakeThread:
     id = "thread-test-123"
 
@@ -34,6 +50,12 @@ class UsageThread(FakeThread):
     def run(self, prompt, effort, sandbox, model=None):
         self.calls.append((prompt, effort, sandbox, model))
         return UsageResult()
+
+
+class TelemetryThread(FakeThread):
+    def run(self, prompt, effort, sandbox, model=None):
+        self.calls.append((prompt, effort, sandbox, model))
+        return TelemetryResult()
 
 
 class FakeCodex:
@@ -59,6 +81,12 @@ class UsageCodex(FakeCodex):
     def thread_start(self, cwd, sandbox):
         self.calls.append(("thread_start", cwd, sandbox))
         return UsageThread(self.calls)
+
+
+class TelemetryCodex(FakeCodex):
+    def thread_start(self, cwd, sandbox):
+        self.calls.append(("thread_start", cwd, sandbox))
+        return TelemetryThread(self.calls)
 
 def write_job(folder, **overrides):
     values = {
@@ -199,18 +227,19 @@ class OrchestratorTests(unittest.TestCase):
             self.assertIn("Stock Research Lab Monitor", rendered)
             self.assertIn("ID: TEST-001", rendered)
             self.assertIn("Model Tier: standard", rendered)
-            self.assertIn("Model: codex-test", rendered)
+            self.assertIn("Requested Model: gpt-5.6-terra", rendered)
+            self.assertIn("Actual Model: N/A", rendered)
             self.assertIn("Reasoning: medium", rendered)
             self.assertIn("completed: 2", rendered)
-            self.assertIn("current turn tokens: 17", rendered)
-            self.assertIn("current job cumulative tokens: 17", rendered)
+            self.assertIn("Turn total: 17", rendered)
+            self.assertIn("Job total: 17", rendered)
             self.assertIn("inspect", rendered)
 
     def test_monitor_no_active_job(self):
         with tempfile.TemporaryDirectory() as tmp:
             rendered = render_monitor(tmp)
             self.assertIn("No active job", rendered)
-            self.assertIn("current turn tokens: N/A", rendered)
+            self.assertIn("Turn total: N/A", rendered)
 
     def test_monitor_aggregates_only_recorded_usage_for_today(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -224,15 +253,51 @@ class OrchestratorTests(unittest.TestCase):
                 }
                 Path(tmp, f"{name}.state.json").write_text(json.dumps(state), encoding="utf-8")
             rendered = render_monitor(tmp)
-            self.assertIn("today's cumulative tokens: 12", rendered)
+            self.assertIn("Today total: 12", rendered)
 
     def test_unavailable_token_data_is_not_fabricated(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = write_job(tmp)
             run_job(path, codex_factory=lambda: FakeCodex([]))
             rendered = render_monitor(tmp)
-            self.assertIn("today's cumulative tokens: N/A", rendered)
-            self.assertIn("current turn tokens: N/A", rendered)
+            self.assertIn("Today total: N/A", rendered)
+            self.assertIn("Turn total: N/A", rendered)
+
+    def test_runtime_telemetry_distinguishes_models_usage_and_timing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = write_job(tmp, model_tier="advanced")
+            job = run_job(path, codex_factory=lambda: TelemetryCodex([]))
+            self.assertEqual(job.requested_model, MODEL_TIERS["advanced"])
+            self.assertEqual(job.resolved_model, MODEL_TIERS["advanced"])
+            self.assertEqual(job.actual_model, "runtime-confirmed-model")
+            self.assertEqual(job.current_turn_input_tokens, 11)
+            self.assertEqual(job.current_turn_output_tokens, 7)
+            self.assertEqual(job.current_turn_total_tokens, 18)
+            self.assertEqual(job.cumulative_tokens, 18)
+            self.assertEqual(job.codex_elapsed_ms, 2000)
+            self.assertEqual(job.local_command_elapsed_ms, 430)
+            self.assertEqual(job.test_elapsed_ms, 400)
+            self.assertIsNotNone(job.total_elapsed_ms)
+            persisted = Path(tmp, "test.state.json").read_text(encoding="utf-8")
+            self.assertNotIn("super-secret-value", persisted)
+
+    def test_actual_model_and_token_fallback_are_na(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = write_job(tmp)
+            job = run_job(path, codex_factory=lambda: FakeCodex([]))
+            self.assertIsNone(job.actual_model)
+            self.assertIsNone(job.current_turn_input_tokens)
+            self.assertIsNone(job.current_turn_total_tokens)
+
+    def test_telemetry_failure_does_not_fail_job_or_persist_command_secret(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = write_job(tmp)
+            with patch("orchestrator.core._capture_telemetry", side_effect=RuntimeError("super-secret-value")):
+                job = run_job(path, codex_factory=lambda: FakeCodex([]))
+            self.assertEqual(job.status, "review")
+            self.assertEqual(job.telemetry_warning, "telemetry unavailable: RuntimeError")
+            persisted = Path(tmp, "test.state.json").read_text(encoding="utf-8")
+            self.assertNotIn("super-secret-value", persisted)
 
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import re
 import tomllib
+from time import perf_counter
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -47,11 +48,29 @@ class Job:
     started_at: str | None = None
     completed_at: str | None = None
     result_location: str | None = None
+    # `model` is retained for backwards-compatible snapshots.  New snapshots
+    # make the requested/resolved/runtime distinction explicit.
     model: str | None = None
+    requested_model: str | None = None
+    resolved_model: str | None = None
+    actual_model: str | None = None
+    current_turn_input_tokens: int | None = None
+    current_turn_output_tokens: int | None = None
+    current_turn_total_tokens: int | None = None
+    current_turn_cached_input_tokens: int | None = None
+    current_turn_reasoning_output_tokens: int | None = None
+    # Legacy alias for snapshots written before detailed token telemetry.
     current_turn_tokens: int | None = None
     cumulative_tokens: int | None = None
     usage_recorded_at: str | None = None
     usage_events: list[dict[str, Any]] | None = None
+    turn_started_at: str | None = None
+    turn_completed_at: str | None = None
+    codex_elapsed_ms: int | None = None
+    local_command_elapsed_ms: int | None = None
+    test_elapsed_ms: int | None = None
+    total_elapsed_ms: int | None = None
+    telemetry_warning: str | None = None
     progress: dict[str, Any] | None = None
     activity: list[dict[str, str]] | None = None
 
@@ -101,8 +120,12 @@ class JobStore:
             "job_id", "objective", "reasoning_tier", "prompt", "sandbox",
             "model_tier", "status", "thread_id", "created_at", "started_at", "completed_at",
             "result_location", "model", "current_turn_tokens",
-            "cumulative_tokens", "usage_recorded_at", "progress", "activity",
-            "usage_events",
+            "requested_model", "resolved_model", "actual_model",
+            "current_turn_input_tokens", "current_turn_output_tokens", "current_turn_total_tokens",
+            "current_turn_cached_input_tokens", "current_turn_reasoning_output_tokens",
+            "cumulative_tokens", "usage_recorded_at", "progress", "activity", "usage_events",
+            "turn_started_at", "turn_completed_at", "codex_elapsed_ms",
+            "local_command_elapsed_ms", "test_elapsed_ms", "total_elapsed_ms", "telemetry_warning",
         ) if key in data})
 
     def save(self, job: Job, path: str | Path) -> None:
@@ -185,15 +208,73 @@ def _value(source: Any, *names: str) -> Any:
     return None
 
 
-def _usage_total(result: Any) -> int | None:
-    usage = _value(result, "usage", "token_usage")
-    total = _value(usage, "total_tokens", "total") if usage is not None else None
-    return total if isinstance(total, int) and total >= 0 else None
+def _nonnegative_int(value: Any) -> int | None:
+    return value if isinstance(value, int) and not isinstance(value, bool) and value >= 0 else None
 
 
-def _model_name(result: Any, thread: Any) -> str | None:
-    model = _value(result, "model", "model_name") or _value(thread, "model", "model_name")
+def _runtime_model(result: Any) -> str | None:
+    """Return only a runtime-confirmed model, never a requested model."""
+    model = _value(result, "actual_model", "runtime_model")
     return str(model) if model else None
+
+
+def _runtime_timestamp(value: Any) -> str | None:
+    if isinstance(value, (int, float)) and not isinstance(value, bool) and value >= 0:
+        return datetime.fromtimestamp(value, timezone.utc).isoformat()
+    return None
+
+
+def _is_test_command(command: Any) -> bool:
+    if not isinstance(command, str):
+        return False
+    return bool(re.search(r"(^|[\s;&|])(pytest|unittest|tox|nox)([\s;&|]|$)|\b(?:npm|pnpm|yarn|cargo|make)\s+test\b", command, re.I))
+
+
+def _capture_telemetry(job: Job, result: Any) -> None:
+    """Copy compact SDK/runtime telemetry without retaining command content."""
+    usage = _value(result, "usage", "token_usage")
+    # The SDK exposes `last` as this turn and `total` as thread lifetime.  We
+    # use only `last` so a resumed thread cannot inflate this job's total.
+    turn_usage = _value(usage, "last") if usage is not None else None
+    turn_usage = turn_usage if turn_usage is not None else usage
+    fields = {
+        "current_turn_input_tokens": _nonnegative_int(_value(turn_usage, "input_tokens")),
+        "current_turn_output_tokens": _nonnegative_int(_value(turn_usage, "output_tokens")),
+        "current_turn_total_tokens": _nonnegative_int(_value(turn_usage, "total_tokens", "total")),
+        "current_turn_cached_input_tokens": _nonnegative_int(_value(turn_usage, "cached_input_tokens")),
+        "current_turn_reasoning_output_tokens": _nonnegative_int(_value(turn_usage, "reasoning_output_tokens")),
+    }
+    for name, value in fields.items():
+        setattr(job, name, value)
+    job.current_turn_tokens = job.current_turn_total_tokens  # legacy alias
+    if job.current_turn_total_tokens is not None:
+        job.cumulative_tokens = (job.cumulative_tokens or 0) + job.current_turn_total_tokens
+        job.usage_recorded_at = _now()
+        job.usage_events.append({
+            "timestamp": job.usage_recorded_at,
+            "input_tokens": job.current_turn_input_tokens,
+            "output_tokens": job.current_turn_output_tokens,
+            "total_tokens": job.current_turn_total_tokens,
+        })
+
+    job.actual_model = _runtime_model(result)
+    job.turn_started_at = _runtime_timestamp(_value(result, "started_at"))
+    job.turn_completed_at = _runtime_timestamp(_value(result, "completed_at"))
+    job.codex_elapsed_ms = _nonnegative_int(_value(result, "duration_ms"))
+    local_elapsed = test_elapsed = 0
+    local_found = test_found = False
+    for item in _value(result, "items") or []:
+        item = _value(item, "root") or item
+        duration = _nonnegative_int(_value(item, "duration_ms"))
+        if duration is None or _value(item, "type") != "commandExecution":
+            continue
+        local_elapsed += duration
+        local_found = True
+        if _is_test_command(_value(item, "command")):
+            test_elapsed += duration
+            test_found = True
+    job.local_command_elapsed_ms = local_elapsed if local_found else None
+    job.test_elapsed_ms = test_elapsed if test_found else None
 
 
 def run_job(path: str | Path, *, codex_factory: Any | None = None) -> Job:
@@ -205,9 +286,13 @@ def run_job(path: str | Path, *, codex_factory: Any | None = None) -> Job:
         raise ValueError(f"job must be pending or rework to run, got {job.status}")
 
     job.transition("running")
+    job.requested_model = MODEL_TIERS[job.model_tier]
+    job.resolved_model = MODEL_TIERS[job.model_tier]
+    job.model = job.resolved_model
     store.save(job, job_path)
     result_dir = store.results_dir / job.job_id
     result_dir.mkdir(parents=True, exist_ok=True)
+    run_started = perf_counter()
     try:
         if codex_factory is None:
             from openai_codex import Codex
@@ -224,16 +309,14 @@ def run_job(path: str | Path, *, codex_factory: Any | None = None) -> Job:
                 model=MODEL_TIERS[job.model_tier],
                 sandbox=sandbox,
             )
-            job.model = _model_name(result, thread) or MODEL_TIERS[job.model_tier]
-            turn_tokens = _usage_total(result)
-            job.current_turn_tokens = turn_tokens
-            if turn_tokens is not None:
-                job.cumulative_tokens = (job.cumulative_tokens or 0) + turn_tokens
-                job.usage_recorded_at = _now()
-                job.usage_events.append({"timestamp": job.usage_recorded_at, "tokens": turn_tokens})
+            try:
+                _capture_telemetry(job, result)
+            except Exception as exc:  # Telemetry must never discard a successful turn.
+                job.telemetry_warning = f"telemetry unavailable: {type(exc).__name__}"
         response = getattr(result, "final_response", str(result))
         (result_dir / "response.md").write_text(response, encoding="utf-8")
         job.result_location = str((result_dir / "response.md").as_posix())
+        job.total_elapsed_ms = round((perf_counter() - run_started) * 1000)
         (result_dir / "metadata.json").write_text(json.dumps({
             "job_id": job.job_id,
             "thread_id": job.thread_id,
@@ -241,9 +324,19 @@ def run_job(path: str | Path, *, codex_factory: Any | None = None) -> Job:
             "model_tier": job.model_tier,
             "reasoning_tier": job.reasoning_tier,
             "sandbox": job.sandbox,
-            "model": job.model,
-            "current_turn_tokens": job.current_turn_tokens,
+            "requested_model": job.requested_model,
+            "resolved_model": job.resolved_model,
+            "actual_model": job.actual_model,
+            "current_turn_input_tokens": job.current_turn_input_tokens,
+            "current_turn_output_tokens": job.current_turn_output_tokens,
+            "current_turn_total_tokens": job.current_turn_total_tokens,
             "cumulative_tokens": job.cumulative_tokens,
+            "turn_started_at": job.turn_started_at,
+            "turn_completed_at": job.turn_completed_at,
+            "codex_elapsed_ms": job.codex_elapsed_ms,
+            "local_command_elapsed_ms": job.local_command_elapsed_ms,
+            "test_elapsed_ms": job.test_elapsed_ms,
+            "total_elapsed_ms": job.total_elapsed_ms,
             "completed_at": _now(),
         }, indent=2) + "\n", encoding="utf-8")
         job.transition("review")
@@ -253,6 +346,7 @@ def run_job(path: str | Path, *, codex_factory: Any | None = None) -> Job:
         job.transition("failed")
         job.result_location = str((result_dir / "error.txt").as_posix())
         job.activity.append({"timestamp": _now(), "message": f"Codex run failed: {type(exc).__name__}"})
+    job.total_elapsed_ms = round((perf_counter() - run_started) * 1000)
     store.save(job, job_path)
     return job
 
@@ -286,8 +380,9 @@ def render_monitor(jobs_dir: str | Path = "jobs", *, now: datetime | None = None
         events = state.get("usage_events") or []
         if events:
             for event in events:
-                if (event.get("timestamp") or "").startswith(today) and isinstance(event.get("tokens"), int):
-                    today_tokens += event["tokens"]
+                tokens = event.get("total_tokens", event.get("tokens"))
+                if (event.get("timestamp") or "").startswith(today) and _nonnegative_int(tokens) is not None:
+                    today_tokens += tokens
                     usage_found = True
         elif (state.get("usage_recorded_at") or "").startswith(today) and isinstance(state.get("cumulative_tokens"), int):
             # Compatibility with snapshots written before usage_events existed.
@@ -305,14 +400,14 @@ def render_monitor(jobs_dir: str | Path = "jobs", *, now: datetime | None = None
     else:
         lines.extend([
             f"  ID: {_display(job.get('job_id'))}",
-            f"  objective/title: {_display(job.get('objective'))}",
-            f"  status: {_display(job.get('status'))}",
-            f"  started_at: {_display(job.get('started_at'))}",
+            f"  Status: {_display(job.get('status'))}",
             f"  Model Tier: {_display(job.get('model_tier') or 'standard')}",
-            f"  Model: {_display(job.get('model'))}",
+            f"  Requested Model: {_display(job.get('requested_model') or job.get('model'))}",
+            f"  Actual Model: {_display(job.get('actual_model'))}",
             f"  Reasoning: {_display(job.get('reasoning_tier'))}",
-            f"  sandbox: {_display(job.get('sandbox'))}",
-            f"  thread ID: {_short_thread_id(job.get('thread_id'))}",
+            f"  Sandbox: {_display(job.get('sandbox'))}",
+            f"  Thread: {_short_thread_id(job.get('thread_id'))}",
+            f"  Elapsed: {_display(job.get('total_elapsed_ms'))} ms",
         ])
         progress = job.get("progress")
         if progress is not None:
@@ -326,9 +421,16 @@ def render_monitor(jobs_dir: str | Path = "jobs", *, now: datetime | None = None
     lines.extend([
         "",
         "Usage",
-        f"  current turn tokens: {_display(job.get('current_turn_tokens') if job else None)}",
-        f"  current job cumulative tokens: {_display(job.get('cumulative_tokens') if job else None)}",
-        f"  today's cumulative tokens: {today_tokens if usage_found else 'N/A'}",
+        f"  Turn input: {_display(job.get('current_turn_input_tokens') if job else None)}",
+        f"  Turn output: {_display(job.get('current_turn_output_tokens') if job else None)}",
+        f"  Turn total: {_display(job.get('current_turn_total_tokens') if job and job.get('current_turn_total_tokens') is not None else (job.get('current_turn_tokens') if job else None))}",
+        f"  Job total: {_display(job.get('cumulative_tokens') if job else None)}",
+        f"  Today total: {today_tokens if usage_found else 'N/A'}",
+        "",
+        "Execution",
+        f"  Codex elapsed: {_display(job.get('codex_elapsed_ms') if job else None)} ms",
+        f"  Local command elapsed: {_display(job.get('local_command_elapsed_ms') if job else None)} ms",
+        f"  Test elapsed: {_display(job.get('test_elapsed_ms') if job else None)} ms",
         "",
         "Recent Activity",
     ])
