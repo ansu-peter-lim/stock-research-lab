@@ -1,0 +1,415 @@
+job_id = "JOB-0010"
+objective = "Repair and validate point-in-time provenance for one genuine historical Telegram Top30 artifact."
+model_tier = "advanced"
+reasoning_tier = "high"
+sandbox = "workspace-write"
+status = "pending"
+thread_id = ""
+created_at = ""
+completed_at = ""
+result_location = ""
+
+prompt = """
+Read all canonical Stock Research Lab documents and previous audit results first.
+
+Review especially:
+
+- docs/historical-research-protocol.md
+- docs/top30-observation-contract.md
+- docs/audits/JOB-0006-point-in-time-leakage-audit.md
+- docs/audits/JOB-0009-legacy-historical-artifact-audit.md
+- docs/experiments/JOB-0008-genuine-telegram-source.md
+- src/research_contracts/top30.py
+- src/research_contracts/historical_fixture.py
+- src/research_contracts/legacy_artifact_inventory.py
+
+TARGET REPOSITORY
+
+D:/Project/research
+
+LEGACY CODE REFERENCE
+
+D:/Project/stock-trading-system-reference
+
+Treat as strictly READ ONLY.
+
+LEGACY DATA REFERENCE
+
+D:/Project/stock
+
+Treat as strictly READ ONLY.
+
+LOCAL SECRET SOURCE
+
+D:/Project/research/.env
+
+May be consumed at runtime only.
+
+Never print, persist, summarize, copy, or expose secret values.
+
+EXISTING TELEGRAM SESSION
+
+D:/Project/stock/telegram_test.session
+
+This is a local legacy session candidate.
+
+CRITICAL SESSION SAFETY RULE
+
+Treat the existing session file as READ ONLY.
+
+Do not allow Telegram/Telethon or any other client to open this original
+session file in a mode that may update, migrate, rewrite, lock, journal,
+or otherwise mutate it.
+
+If Telegram client operation requires a writable session:
+
+- first create a Git-ignored working COPY under the target repository's
+  local session area;
+- verify the copy is excluded by Git;
+- use only the working copy;
+- never modify the original legacy session.
+
+Do not persist session contents or authentication material in research
+artifacts.
+
+If the session is unauthorized, stop acquisition and report that fact
+without requesting or exposing OTP/2FA credentials.
+
+TARGET HISTORICAL ARTIFACT
+
+Legacy raw file:
+
+D:/Project/stock/data/telegram/daily/2023-09-01_07-36-30_15617.txt
+
+Telegram message ID:
+
+15617
+
+Use the source/channel identity expected by the legacy acquisition code.
+
+Do not guess a channel identifier if it cannot be established from existing
+configuration/code without exposing secrets.
+
+OBJECTIVE
+
+Determine how much historical provenance can be repaired for exactly this
+one genuine legacy Telegram artifact.
+
+Do NOT generalize to all 782 artifacts in this job.
+
+Do NOT perform future-price/outcome analysis.
+
+Do NOT migrate bulk Telegram data.
+
+Do NOT use current KRX master information.
+
+STEP 1 — PRESERVE LEGACY STATE
+
+Before any Telegram access record:
+
+- legacy raw artifact path;
+- raw artifact byte length;
+- SHA-256 of current legacy bytes;
+- legacy processed-manifest linkage if present;
+- stored manifest hash if present;
+- correction-registry linkage if any;
+- legacy session path/existence;
+- legacy session file size and SHA-256 for mutation detection.
+
+Do not read or expose session contents.
+
+After Telegram access, verify the ORIGINAL legacy session SHA-256 and size
+are unchanged.
+
+Failure of this invariant is HIGH severity and must stop the experiment.
+
+STEP 2 — AUTHORIZATION CHECK
+
+Using a safe working session copy if necessary:
+
+- determine whether the existing Telegram session is authorized;
+- do not expose account identity beyond what is necessary;
+- do not print phone number, authentication token, API hash, or other
+  sensitive account data.
+
+If unauthorized:
+
+- record AUTHORIZATION_BLOCKED;
+- do not attempt interactive login;
+- do not fabricate provenance;
+- stop the network portion safely.
+
+STEP 3 — RETRIEVE EXACT MESSAGE
+
+If authorized, retrieve exactly Telegram message ID 15617.
+
+Do not bulk-download history.
+
+Record non-secret Telegram metadata where available:
+
+- message ID;
+- channel/chat stable identifier suitable for provenance;
+- message timestamp;
+- edit timestamp or explicit none/unknown;
+- retrieval timestamp;
+- deletion/unavailability state if observable;
+- message text/content needed for byte comparison.
+
+Do not infer revision history that Telegram does not expose.
+
+STEP 4 — CONTENT COMPARISON
+
+Compare the legacy local artifact with the currently retrieved Telegram
+message.
+
+First determine how the legacy acquisition code serialized Telegram content.
+
+Do not assume the local .txt bytes equal raw Telegram API bytes if the legacy
+collector added metadata, line endings, headers, encoding changes, or
+normalization.
+
+Produce explicit comparison levels:
+
+1. RAW_FILE_BYTES
+2. LEGACY_SERIALIZED_MESSAGE_CONTENT
+3. CURRENT_TELEGRAM_MESSAGE_CONTENT
+
+Where deterministic reconstruction is possible, compare canonical serialized
+content using the exact legacy serialization rules.
+
+Report:
+
+- exact match;
+- canonical match;
+- mismatch;
+- comparison impossible.
+
+Never silently normalize until content matches.
+
+Document every normalization/transformation used.
+
+STEP 5 — TIMESTAMP / AVAILABILITY ANALYSIS
+
+Keep these concepts separate:
+
+SOURCE_TIMESTAMP
+Telegram message date.
+
+EDIT_TIMESTAMP
+Telegram edit date if exposed.
+
+LEGACY_FILE_TIMESTAMP
+Filesystem timestamp, which is NOT automatically historical evidence.
+
+RETRIEVAL_TIMESTAMP
+Current JOB-0010 acquisition time.
+
+HISTORICAL_AVAILABILITY
+What can actually be proven about cutoff visibility.
+
+The intended historical cutoff for this artifact should be derived
+conservatively from the original Top30 report/source semantics.
+
+Do not assume:
+
+message date == immutable content availability.
+
+If edit_timestamp exists after the intended cutoff:
+
+- current message content must NOT be considered cutoff-visible without
+  independent evidence;
+- classify accordingly.
+
+If edit_timestamp is absent:
+
+- do not overclaim that no historical edit ever occurred unless Telegram
+  semantics actually support that conclusion.
+
+STEP 6 — EVIDENCE CLASSIFICATION
+
+Classify the repaired artifact into exactly one:
+
+A — CUTOFF_VERIFIED
+
+Strong evidence supports source identity, message identity, content, and
+availability at the historical cutoff.
+
+B — SOURCE_VERIFIED_CONTENT_STRONGLY_SUPPORTED
+
+Telegram source/message/timestamp are verified and current content matches
+the independently preserved legacy artifact, but immutable historical
+byte-level availability cannot be proven completely.
+
+C — SOURCE_VERIFIED_CONTENT_UNCERTAIN
+
+Source/message identity is verified but content or edit history leaves
+material uncertainty.
+
+D — LOCAL_ONLY_PROVENANCE
+
+Telegram verification could not be completed; only the legacy local artifact
+is available.
+
+E — CONTRADICTED
+
+Telegram metadata/content conflicts materially with the legacy artifact.
+
+Be conservative.
+
+A classification requires actual evidence, not inference from filenames.
+
+STEP 7 — PROVENANCE REPAIR ARTIFACT
+
+Create a small deterministic provenance-repair record in the target repository.
+
+It may reference the legacy artifact but must not modify or duplicate the
+bulk legacy dataset.
+
+Bind at minimum:
+
+- repair record ID/version;
+- legacy artifact path;
+- legacy current-audit SHA-256;
+- legacy processed-manifest linkage;
+- Telegram message ID;
+- Telegram source/channel identifier when verified;
+- source timestamp;
+- edit timestamp;
+- retrieval timestamp;
+- comparison method;
+- comparison result;
+- evidence classification;
+- availability interpretation;
+- provenance limitations;
+- repair-record digest.
+
+Clearly label newly calculated hashes as current/repaired audit evidence,
+not acquisition-time historical hashes.
+
+STEP 8 — NEW PIPELINE COMPATIBILITY
+
+Determine whether this repaired evidence is sufficient to create a genuine
+JOB-0007-style fixture manifest.
+
+If classification/evidence permits, create only the minimal real fixture
+manifest needed for the next experiment.
+
+Do NOT create an AssessmentPayload or frozen assessment in this job unless
+the evidence meets the existing point-in-time contract without weakening
+JOB-0006 protections.
+
+Prefer stopping before assessment rather than overstating evidence.
+
+STEP 9 — CORRECTION BOUNDARY
+
+Check whether message 15617 has any entry in:
+
+D:/Project/stock/data/manual/telegram/top30_corrections.csv
+
+If none, record none.
+
+If one exists, keep it strictly separate as retrospective correction metadata.
+
+Never alter raw content using correction data.
+
+STEP 10 — TESTS
+
+Add focused tests proving at minimum:
+
+1. original legacy session cannot be modified by the acquisition adapter;
+2. working session copies remain Git-ignored;
+3. original session size/hash mutation detection works;
+4. credential/session contents are not persisted;
+5. legacy raw artifact digest is deterministic;
+6. legacy processed-manifest linkage is validated when available;
+7. Telegram source/message identity remains explicit;
+8. source/edit/retrieval timestamps remain distinct;
+9. no-edit and unknown-edit semantics are not overstated;
+10. comparison transformations are explicit;
+11. mismatch cannot be converted into a match by undocumented normalization;
+12. repaired provenance classification is explicit;
+13. current audit digest cannot masquerade as acquisition-time digest;
+14. retrospective correction data remains separate;
+15. existing JOB-0006 leakage tests still pass;
+16. existing JOB-0007 write-once tests still pass;
+17. JOB-0009 provenance safeguards still pass.
+
+NO OUTCOME DATA
+
+Do not access or attach:
+
+- future OHLCV;
+- +5/+10/+20/+60 returns;
+- sector outcomes;
+- success/failure labels;
+- future KRX identity.
+
+DOCUMENTATION
+
+Create:
+
+docs/experiments/JOB-0010-telegram-provenance-repair.md
+
+Document:
+
+- target artifact;
+- session handling method;
+- authorization result;
+- Telegram metadata result;
+- legacy serialization reconstruction;
+- content comparison;
+- timestamp semantics;
+- availability analysis;
+- evidence classification;
+- provenance-repair record;
+- whether a genuine fixture manifest was permitted;
+- limitations.
+
+READINESS VERDICT
+
+End with exactly one:
+
+REAL_FIXTURE_PROVENANCE_READY
+REAL_FIXTURE_PROVENANCE_READY_WITH_RESTRICTIONS
+PROVENANCE_STILL_INSUFFICIENT
+AUTHORIZATION_BLOCKED
+PROVENANCE_CONTRADICTED
+
+This verdict applies only to this single message and the next small
+historical fixture step.
+
+It does NOT authorize bulk repair, outcome joining, or the three-year study.
+
+QUALITY
+
+Run the complete pytest suite.
+Run git diff --check.
+
+Do not commit or push.
+
+FINAL RESPONSE
+
+Report:
+
+- requested model tier;
+- actual model if telemetry exposes it;
+- target message ID;
+- authorization status;
+- original legacy session mutation check;
+- Telegram source timestamp;
+- Telegram edit timestamp status;
+- retrieval timestamp;
+- legacy artifact SHA-256;
+- legacy manifest hash match/mismatch;
+- content comparison result;
+- evidence classification;
+- correction linkage;
+- whether a genuine fixture manifest was allowed;
+- tests;
+- readiness verdict;
+- residual risks;
+- recommended next job.
+
+Never expose credentials, phone numbers, session contents, or authentication
+tokens.
+"""
