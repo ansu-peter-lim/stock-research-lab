@@ -1,0 +1,92 @@
+job_id = "JOB-0003"
+objective = "Define and validate the parser-to-point-in-time Top30 observation contract."
+reasoning_tier = "medium"
+sandbox = "workspace-write"
+status = "pending"
+thread_id = ""
+prompt = """
+Read the canonical project documents and docs/migration/legacy-inventory.md first.
+
+Legacy reference repository:
+D:/Project/stock-trading-system-reference
+
+Treat the legacy repository as strictly READ ONLY.
+Do not use GitHub web requests.
+
+OBJECTIVE
+
+Define the minimal point-in-time observation contract between historical
+Top30 parsing and the future research pipeline.
+
+This job is deliberately narrow.
+Do NOT migrate the full legacy parser, KRX, Kiwoom, eligibility, or backtest systems.
+Do NOT process the full three-year dataset yet.
+
+DESIGN REQUIREMENTS
+
+A historical Top30 observation must distinguish information genuinely known
+at cutoff time from information attached retrospectively.
+
+Define fields sufficient to preserve at least:
+
+- observation/cutoff date and time
+- Top30 rank/order when available
+- stock name exactly as observed in the source
+- stock code only when point-in-time provenance supports it
+- source/provenance identity
+- raw/source reference sufficient for audit
+- parser version
+- ingestion timestamp
+- explicit point-in-time vs retrospective/enrichment boundary
+- unresolved mapping state rather than silently using future mapping data
+
+Prevent later KRX/current-master information from silently becoming
+historical truth.
+
+IMPLEMENTATION
+
+Create only the minimal models/contracts required for this boundary.
+
+Add small representative fixtures based on the legacy parser behavior.
+Do not copy large datasets.
+
+Add tests proving at minimum:
+
+1. A valid historical Top30 observation can be created.
+2. Source stock name is preserved.
+3. Unknown historical stock code can remain unresolved.
+4. Retrospective enrichment is distinguishable from cutoff-known data.
+5. Future-dated information is rejected or cannot enter the assessment payload.
+6. Serialization is deterministic/reproducible.
+7. Provenance fields survive serialization round-trip.
+
+Document the contract and the point-in-time boundary.
+
+Also add a SMALL convenience command for creating future job TOML files,
+only if it can be done without expanding the orchestrator architecture.
+Target usage may be similar to:
+
+    python -m orchestrator new JOB-0004
+
+Do not build interactive UI or generalized workflow tooling.
+
+QUALITY
+
+Run the complete test suite.
+Run git diff --check.
+Keep implementation small and explicit.
+Do not commit or push.
+
+FINAL RESPONSE
+
+Report:
+- contract design
+- files created/changed
+- leakage protections
+- tests
+- unresolved design questions
+- recommended next job
+"""
+created_at = ""
+completed_at = ""
+result_location = ""

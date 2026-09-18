@@ -1,0 +1,23 @@
+{
+  "observation_date": "2026-08-29",
+  "cutoff_at": "2026-08-29T01:02:03Z",
+  "rank": 1,
+  "stock_name": "삼성전자",
+  "parser_version": "legacy-top30-adapter-0.1",
+  "return_pct": "12.10",
+  "detail_raw": "상세 원문은 보존한다",
+  "source": {
+    "source_kind": "telegram_export",
+    "source_id": "telegram:balanceasset:123",
+    "raw_reference": "2026-08-29_01-02-03_123.txt#rank=1",
+    "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "available_at": "2026-08-29T01:02:03Z"
+  },
+  "mapping": {
+    "status": "unresolved",
+    "stock_code": null,
+    "evidence": null
+  },
+  "ingested_at": "2026-09-18T00:00:00Z",
+  "enrichments": []
+}

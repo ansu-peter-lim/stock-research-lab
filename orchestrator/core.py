@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import tomllib
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
@@ -126,6 +127,26 @@ class JobStore:
 
     def state_files(self) -> list[Path]:
         return sorted(self.jobs_dir.glob("*.state.json"))
+
+
+def create_job_file(job_id: str, jobs_dir: str | Path = "jobs") -> Path:
+    """Create a small pending TOML specification for a future approved job."""
+    if not re.fullmatch(r"JOB-[0-9]{4}", job_id):
+        raise ValueError("job id must match JOB-0000")
+    target = Path(jobs_dir) / f"{job_id}.toml"
+    if target.exists():
+        raise FileExistsError(target)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        f'job_id = "{job_id}"\n'
+        'objective = "Describe the bounded objective before implementation."\n'
+        'reasoning_tier = "medium"\n'
+        'sandbox = "read-only"\n'
+        'status = "pending"\n'
+        'prompt = "Replace this prompt with the approved job scope and acceptance criteria."\n',
+        encoding="utf-8",
+    )
+    return target
 
 
 def load_job(path: str | Path) -> Job:

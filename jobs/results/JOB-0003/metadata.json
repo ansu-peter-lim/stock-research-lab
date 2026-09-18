@@ -1,0 +1,11 @@
+{
+  "job_id": "JOB-0003",
+  "thread_id": "01a0b4d5-905b-7f03-b967-566b181e47d1",
+  "started_at": "2026-09-18T14:04:48.494301+00:00",
+  "reasoning_tier": "medium",
+  "sandbox": "workspace-write",
+  "model": null,
+  "current_turn_tokens": null,
+  "cumulative_tokens": null,
+  "completed_at": "2026-09-18T14:10:07.015573+00:00"
+}

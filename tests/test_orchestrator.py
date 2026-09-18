@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from orchestrator.core import Job, JobStore, render_monitor, run_job
+from orchestrator.core import Job, JobStore, create_job_file, render_monitor, run_job
 from orchestrator.__main__ import main
 
 
@@ -77,6 +77,14 @@ def write_job(folder, **overrides):
 
 
 class OrchestratorTests(unittest.TestCase):
+    def test_new_job_file_is_small_and_pending(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = create_job_file("JOB-0004", tmp)
+            self.assertEqual(path.name, "JOB-0004.toml")
+            self.assertIn('status = "pending"', path.read_text(encoding="utf-8"))
+            with self.assertRaises(FileExistsError):
+                create_job_file("JOB-0004", tmp)
+
     def test_reasoning_tier_mapping(self):
         self.assertEqual(Job("a", "b", "low", "p").reasoning_tier, "low")
         self.assertEqual(Job("a", "b", "medium", "p").reasoning_tier, "medium")

@@ -1,0 +1,29 @@
+{
+  "job_id": "JOB-0003",
+  "objective": "Define and validate the parser-to-point-in-time Top30 observation contract.",
+  "reasoning_tier": "medium",
+  "prompt": "Read the canonical project documents and docs/migration/legacy-inventory.md first.\n\nLegacy reference repository:\nD:/Project/stock-trading-system-reference\n\nTreat the legacy repository as strictly READ ONLY.\nDo not use GitHub web requests.\n\nOBJECTIVE\n\nDefine the minimal point-in-time observation contract between historical\nTop30 parsing and the future research pipeline.\n\nThis job is deliberately narrow.\nDo NOT migrate the full legacy parser, KRX, Kiwoom, eligibility, or backtest systems.\nDo NOT process the full three-year dataset yet.\n\nDESIGN REQUIREMENTS\n\nA historical Top30 observation must distinguish information genuinely known\nat cutoff time from information attached retrospectively.\n\nDefine fields sufficient to preserve at least:\n\n- observation/cutoff date and time\n- Top30 rank/order when available\n- stock name exactly as observed in the source\n- stock code only when point-in-time provenance supports it\n- source/provenance identity\n- raw/source reference sufficient for audit\n- parser version\n- ingestion timestamp\n- explicit point-in-time vs retrospective/enrichment boundary\n- unresolved mapping state rather than silently using future mapping data\n\nPrevent later KRX/current-master information from silently becoming\nhistorical truth.\n\nIMPLEMENTATION\n\nCreate only the minimal models/contracts required for this boundary.\n\nAdd small representative fixtures based on the legacy parser behavior.\nDo not copy large datasets.\n\nAdd tests proving at minimum:\n\n1. A valid historical Top30 observation can be created.\n2. Source stock name is preserved.\n3. Unknown historical stock code can remain unresolved.\n4. Retrospective enrichment is distinguishable from cutoff-known data.\n5. Future-dated information is rejected or cannot enter the assessment payload.\n6. Serialization is deterministic/reproducible.\n7. Provenance fields survive serialization round-trip.\n\nDocument the contract and the point-in-time boundary.\n\nAlso add a SMALL convenience command for creating future job TOML files,\nonly if it can be done without expanding the orchestrator architecture.\nTarget usage may be similar to:\n\n    python -m orchestrator new JOB-0004\n\nDo not build interactive UI or generalized workflow tooling.\n\nQUALITY\n\nRun the complete test suite.\nRun git diff --check.\nKeep implementation small and explicit.\nDo not commit or push.\n\nFINAL RESPONSE\n\nReport:\n- contract design\n- files created/changed\n- leakage protections\n- tests\n- unresolved design questions\n- recommended next job\n",
+  "sandbox": "workspace-write",
+  "status": "accepted",
+  "thread_id": "01a0b4d5-905b-7f03-b967-566b181e47d1",
+  "created_at": "2026-09-18T14:04:48.494278+00:00",
+  "started_at": "2026-09-18T14:04:48.494301+00:00",
+  "completed_at": "2026-09-18T14:13:15.404579+00:00",
+  "result_location": "jobs/results/JOB-0003/response.md",
+  "model": null,
+  "current_turn_tokens": null,
+  "cumulative_tokens": null,
+  "usage_recorded_at": null,
+  "usage_events": [],
+  "progress": null,
+  "activity": [
+    {
+      "timestamp": "2026-09-18T14:04:50.472620+00:00",
+      "message": "Codex thread started"
+    },
+    {
+      "timestamp": "2026-09-18T14:10:07.016652+00:00",
+      "message": "Codex run completed; awaiting review"
+    }
+  ]
+}
