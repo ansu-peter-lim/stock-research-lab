@@ -1,0 +1,62 @@
+job_id = "JOB-0001"
+objective = "Add a minimal terminal monitor for Stock Research Lab Codex jobs."
+reasoning_tier = "medium"
+sandbox = "workspace-write"
+status = "pending"
+thread_id = ""
+prompt = """
+Read the canonical project documents and existing orchestrator implementation first.
+
+Implement a minimal terminal monitor invoked as:
+
+    python -m orchestrator monitor
+
+Required display:
+
+Stock Research Lab Monitor
+
+Current Job
+  ID
+  objective/title
+  status
+  started_at
+  model
+  reasoning tier
+  sandbox
+  abbreviated thread ID
+
+Usage
+  current turn tokens
+  current job cumulative tokens
+  today's cumulative tokens
+
+Progress
+  completed/current/pending steps when progress information exists
+
+Recent Activity
+  timestamped recent activity entries
+
+Requirements:
+- Extend the existing orchestrator; do not replace it.
+- Keep storage file-based. No database.
+- No web UI, server, scheduler, queue, curses UI, or external monitoring service.
+- Monitor must work when no job is running.
+- Existing command syntax for running TOML jobs must remain compatible.
+- Record started_at in addition to existing job metadata.
+- Persist model and token usage when the installed Codex SDK exposes them.
+- Never fabricate token counts. Display N/A when unavailable.
+- Today's cumulative usage means only Codex usage recorded by this Stock Research Lab orchestrator, not the user's total ChatGPT/Codex account quota.
+- Provide a simple mechanism for the runner to persist progress/activity events.
+- Do not create fake progress for jobs that do not report it.
+- Keep logs/results concise to control token and disk usage.
+- Add tests for monitor rendering, no-active-job behavior, usage aggregation, and unavailable token data.
+- Preserve existing tests.
+- Run all tests and git diff --check.
+- Do not commit or push.
+
+Final response:
+report implementation, test results, token-usage limitations, and git status.
+"""
+created_at = ""
+completed_at = ""
+result_location = ""
