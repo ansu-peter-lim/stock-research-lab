@@ -1,0 +1,253 @@
+job_id = "JOB-0007"
+objective = "Build and validate the first immutable historical Top30 fixture and write-once assessment artifact."
+model_tier = "standard"
+reasoning_tier = "medium"
+sandbox = "workspace-write"
+status = "pending"
+thread_id = ""
+created_at = ""
+completed_at = ""
+result_location = ""
+
+prompt = """
+Read all canonical Stock Research Lab documents and prior audit results first.
+
+Review especially:
+
+- docs/historical-research-protocol.md
+- docs/top30-observation-contract.md
+- docs/audits/JOB-0006-point-in-time-leakage-audit.md
+- docs/migration/legacy-inventory.md
+- src/research_contracts/top30.py
+- tests/test_top30_contract.py
+- tests/test_historical_identity.py
+- tests/test_point_in_time_leakage.py
+
+Legacy reference repository:
+D:/Project/stock-trading-system-reference
+
+Treat the legacy repository as strictly READ ONLY.
+Use local files only.
+Do not use GitHub web requests.
+
+ROLE
+
+Implement the first small real historical fixture experiment while preserving
+the point-in-time boundary established and hardened in JOB-0003 through
+JOB-0006.
+
+This is NOT a backtest and NOT an outcome study.
+
+OBJECTIVE
+
+Build a minimal pipeline:
+
+historical source artifact
+    ->
+immutable byte-verified fixture manifest
+    ->
+Top30 parser/observation
+    ->
+historical identity resolution
+    ->
+AssessmentPayload
+    ->
+write-once frozen assessment artifact
+
+No future price/outcome data may enter this job.
+
+SCOPE
+
+Use only a SMALL historical fixture set.
+
+Prefer a small number of representative Top30 observations from one historical
+cutoff/date, sufficient to exercise:
+
+- a normally resolved identity
+- an unresolved identity if available
+- source provenance
+- cutoff/availability semantics
+- deterministic parsing and serialization
+
+Do not process the full three-year history.
+
+SOURCE ARTIFACT REQUIREMENTS
+
+For every raw fixture artifact preserve:
+
+- exact source bytes
+- SHA-256 digest
+- source identifier/reference
+- source timestamp when known
+- ingestion timestamp
+- availability timestamp or explicit unknown state
+- artifact type/format
+- fixture provenance
+
+Do not silently normalize or rewrite the source bytes before hashing.
+
+If a reliable historical availability timestamp cannot be proven, represent
+that uncertainty explicitly.
+
+Do not invent historical timestamps.
+
+IMMUTABLE FIXTURE MANIFEST
+
+Implement a small deterministic manifest binding:
+
+- fixture ID
+- raw artifact path/reference
+- byte length
+- SHA-256 digest
+- provenance
+- source timestamp
+- availability state/time
+- parser/version information
+
+Validation must fail if fixture bytes no longer match the manifest digest.
+
+IDENTITY
+
+Use the existing HistoricalIdentityBundle contract.
+
+Do not use current KRX master data as historical truth.
+
+If point-in-time evidence is insufficient:
+- preserve source-observed name;
+- leave identity unresolved.
+
+Retrospective identity information may be stored only behind the existing
+retrospective boundary and must not enter AssessmentPayload.
+
+FROZEN ASSESSMENT ARTIFACT
+
+Create a deterministic frozen assessment artifact for the fixture.
+
+The artifact must bind at minimum:
+
+- fixture/manifest digest
+- cutoff
+- observation identities
+- assessment payload
+- contract/schema version
+- creation metadata
+- deterministic content digest
+
+WRITE-ONCE REQUIREMENT
+
+A frozen assessment must not be silently overwritten.
+
+If the same assessment ID/path already exists:
+
+- identical deterministic content may be treated as an idempotent no-op;
+- different content must fail loudly;
+- never replace the previous frozen assessment.
+
+The design must make historical rewrites visible.
+
+DOWNSTREAM SAFETY
+
+Unresolved observations must remain explicit in the frozen artifact.
+
+Do not silently:
+- drop unresolved rows;
+- current-map them;
+- guess codes;
+- convert them to resolved rows.
+
+NO OUTCOME JOIN
+
+Do not load, compute, inspect, or attach:
+
+- +5/+10/+20/+60 returns
+- future OHLCV
+- future sector performance
+- future labels
+- success/failure classification
+
+This job freezes historical inputs and assessment only.
+
+TESTS
+
+Add tests proving at minimum:
+
+1. raw fixture bytes match their stored digest;
+2. byte modification causes manifest validation failure;
+3. deterministic manifest serialization;
+4. source/provenance metadata survives round trip;
+5. unknown availability remains explicit;
+6. unresolved identity survives the full fixture-to-assessment pipeline;
+7. retrospective identity cannot enter the frozen assessment;
+8. frozen assessment serialization is deterministic;
+9. identical re-freeze is idempotent;
+10. different-content overwrite is rejected;
+11. frozen artifact binds to the correct fixture digest;
+12. future/outcome fields are absent from the frozen artifact;
+13. existing point-in-time adversarial tests continue to pass.
+
+SECURITY / DATA
+
+Do not commit secrets, credentials, API keys, Telegram credentials,
+brokerage information, or account data.
+
+Do not perform network acquisition in this job.
+
+Do not modify the legacy repository.
+
+DOCUMENTATION
+
+Create:
+
+docs/experiments/JOB-0007-historical-fixture.md
+
+Document:
+
+- selected fixture scope
+- exact source provenance
+- what was actually known at cutoff
+- what remains unknown
+- identity-resolution results
+- manifest/digest design
+- freeze semantics
+- unresolved observations
+- limitations
+- whether the fixture pipeline is ready for a separate outcome experiment
+
+READINESS VERDICT
+
+End with exactly one:
+
+READY_FOR_OUTCOME_FIXTURE
+READY_WITH_RESTRICTIONS
+NOT_READY
+
+This verdict applies only to a small outcome fixture experiment,
+not to the full three-year study.
+
+QUALITY
+
+Run the complete pytest suite.
+Run git diff --check.
+
+Keep implementation minimal.
+Do not introduce a database, web UI, scheduler, or generalized artifact store.
+
+Do not commit or push.
+
+FINAL RESPONSE
+
+Report:
+
+- requested model tier
+- actual model if runtime telemetry exposes it
+- fixture selected
+- source provenance
+- files created/changed
+- resolved/unresolved identity counts
+- manifest/digest validation result
+- frozen-assessment write-once validation result
+- tests
+- readiness verdict
+- residual risks
+- recommended next job
+"""

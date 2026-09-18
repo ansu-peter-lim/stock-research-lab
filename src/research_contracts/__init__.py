@@ -12,6 +12,15 @@ from .top30 import (
     RetrospectiveEnrichment,
     Top30Observation,
 )
+from .historical_fixture import (
+    AvailabilityState,
+    FixtureManifest,
+    FixtureManifestEntry,
+    FrozenAssessment,
+    build_frozen_assessment,
+    parse_top30_fixture,
+    write_frozen_assessment,
+)
 
 __all__ = [
     "AssessmentPayload",
@@ -24,4 +33,11 @@ __all__ = [
     "Provenance",
     "RetrospectiveEnrichment",
     "Top30Observation",
+    "AvailabilityState",
+    "FixtureManifest",
+    "FixtureManifestEntry",
+    "FrozenAssessment",
+    "build_frozen_assessment",
+    "parse_top30_fixture",
+    "write_frozen_assessment",
 ]
